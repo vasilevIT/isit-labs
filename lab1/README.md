@@ -24,7 +24,7 @@
 - Комментарий
 - Исполнитель
 
-![alttext](./diagrams/images/objects.png =250x)
+![alttext](./diagrams/images/objects.png)
 
 ##  Роли и пользователи
 
