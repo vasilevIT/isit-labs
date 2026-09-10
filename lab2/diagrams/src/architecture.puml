@@ -1,0 +1,55 @@
+@startuml architecture
+title Диаграмма компонентов — Система управления задачами команды
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor #EAF4FC
+    BorderColor    #3498DB
+}
+skinparam database {
+    BackgroundColor #FDF2E9
+    BorderColor    #E67E22
+}
+skinparam actor {
+    BackgroundColor #FFFFFF
+}
+
+actor "Сотрудник"     as employee
+actor "Руководитель"  as manager
+actor "Администратор" as admin
+
+package "Клиентская часть" {
+    [Веб-интерфейс\n(Frontend)]      as web
+    [Мобильное приложение]           as mobile
+}
+
+package "Серверная часть" {
+    [API-сервер\n(Backend)]          as api
+    [Модуль аутентификации]          as auth
+    [Модуль уведомлений]             as notify
+    [Модуль отчётов и статистики]    as reports
+}
+
+database "База данных\n(PostgreSQL)" as db
+
+cloud "Внешние сервисы" {
+    [Email / Push сервис] as email
+}
+
+employee --> web
+manager  --> web
+admin    --> web
+employee --> mobile
+
+web    --> api    : HTTPS / REST
+mobile --> api    : HTTPS / REST
+
+api --> auth      : проверка прав
+api --> db        : SQL-запросы
+api --> reports   : запрос статистики
+api --> notify    : событие изменения
+
+reports --> db    : SQL-запросы
+notify  --> email : Email / Push
+
+@enduml
