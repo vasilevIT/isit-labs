@@ -147,7 +147,26 @@
             color: #7f8c8d;
             font-size: 0.9em;
         }
+        
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -264,6 +283,50 @@ admin --&gt; UC2<br>
             <p>Подробнее про Use Case: <a href="https://ru.wikipedia.org/wiki/Диаграмма_прецедентов">Диаграмма прецедентов (UML)</a></p>
         </div>
 
+        <p><strong>Пример диаграммы прецедентов (абстрактный):</strong></p>
+
+        <div class="diagram-container">
+            <div class="mermaid">
+                flowchart LR
+                customer(["Покупатель"])
+                staff(["Сотрудник"])
+
+                subgraph System["Интернет-магазин"]
+                UC1([Просмотр каталога])
+                UC2([Поиск товара])
+                UC3([Создать заказ])
+                UC4([Оплатить заказ])
+                UC5([Обработать заказ])
+                UC6([Отправить товар])
+                UC7([Просмотр статистики])
+                end
+
+                customer --> UC1
+                customer --> UC2
+                customer --> UC3
+                customer --> UC4
+
+                staff --> UC5
+                staff --> UC6
+                staff --> UC7
+
+                UC3 -.->|include| UC4
+            </div>
+        </div>
+
+        <p>На этой диаграмме:</p>
+        <ul>
+            <li><strong>Актёры</strong> (слева) — Покупатель и Сотрудник</li>
+            <li><strong>Сценарии</strong> (в коробке) — Просмотр каталога, Поиск, Создание заказа, и т.д.</li>
+            <li><strong>Линии</strong> показывают, какие сценарии доступны каждому актёру</li>
+        </ul>
+
+        <p>Диаграмма сохраняется в двух форматах:</p>
+        <ul>
+            <li>diagrams/use-cases.drawio</li>
+            <li>diagrams/use-cases.png</li>
+        </ul>
+
         <p>Определите основные сценарии взаимодействия пользователей с системой.</p>
         <p>Для каждого сценария укажите:</p>
         <ul>
@@ -283,11 +346,6 @@ admin --&gt; UC2<br>
             <li>связи актёров со сценариями — линии;</li>
             <li>границы системы — прямоугольник, охватывающий все сценарии.</li>
         </ul>
-        <p>Диаграмма сохраняется в двух форматах:</p>
-        <ul>
-            <li>diagrams/use-cases.drawio</li>
-            <li>diagrams/use-cases.png</li>
-        </ul>
 
         <h3>Шаг 5. Определение компонентов системы</h3>
 
@@ -304,6 +362,45 @@ admin --&gt; UC2<br>
             <p><strong>Как визуализировать:</strong> компоненты изображаются в виде прямоугольников с названием, связи — стрелками с подписью типа взаимодействия (HTTP-запрос, SQL-запрос, отправка email и т.п.).</p>
             <p>Подробнее: <a href="https://ru.wikipedia.org/wiki/Диаграмма_компонентов">Диаграмма компонентов (UML)</a></p>
         </div>
+
+        <p><strong>Пример диаграммы компонентов (абстрактный):</strong></p>
+
+        <div class="diagram-container">
+            <div class="mermaid">
+flowchart TB
+    user(["Пользователь"])
+
+    subgraph Client["Клиентская часть"]
+        ui["Веб-интерфейс"]
+    end
+
+    subgraph Server["Серверная часть"]
+        api["API-сервер"]
+        auth["Аутентификация"]
+        notify["Уведомления"]
+    end
+
+    db[("База данных")]
+    cache[("Redis<br/>Кэш")]
+    email>"Email / SMS"]
+
+    user --> ui
+
+    ui -->|HTTP<br/>REST| api
+    api --> auth
+    api -->|SQL| db
+    api -->|Кэш| cache
+    api --> notify
+    notify --> email
+            </div>
+        </div>
+
+        <p>На этой диаграмме:</p>
+        <ul>
+            <li><strong>Компоненты</strong> (в прямоугольниках) — Веб-интерфейс, API, Аутентификация, БД, Кэш, Уведомления</li>
+            <li><strong>Стрелки</strong> показывают направление взаимодействия</li>
+            <li><strong>Подписи</strong> объясняют, какие данные передаются (HTTP, SQL, Кэш, Email и т.д.)</li>
+        </ul>
 
         <p>Определите основные компоненты архитектуры. Типовой набор:</p>
         <ul>
@@ -325,6 +422,7 @@ admin --&gt; UC2<br>
             <li>Связи между компонентами</li>
             <li>Подписи связей (тип запроса или данные)</li>
         </ul>
+
         <p>Диаграмма сохраняется в двух форматах:</p>
         <ul>
             <li>diagrams/architecture.drawio</li>
@@ -358,7 +456,6 @@ admin --&gt; UC2<br>
 ## 5. Компоненты системы<br>
 ## 6. Диаграмма компонентов<br>
 ## 7. Концепция информационной системы<br>
-## 8. Вывод<br>
         </div>
 
         <h3>1. Описание предметной области</h3>
@@ -396,9 +493,6 @@ admin --&gt; UC2<br>
             <li>Тип системы</li>
             <li>Основные компоненты и их взаимодействие</li>
         </ul>
-
-        <h3>8. Вывод</h3>
-        <p>Краткое резюме работы и ключевые выводы.</p>
 
         <h2>Требования к оформлению</h2>
         <ul>

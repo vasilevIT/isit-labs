@@ -1,0 +1,44 @@
+@startuml component-example
+title Пример: Диаграмма компонентов системы
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor #EAF4FC
+    BorderColor    #3498DB
+}
+skinparam database {
+    BackgroundColor #FDF2E9
+    BorderColor    #E67E22
+}
+
+actor "Пользователь" as user
+
+package "Клиентская часть" {
+    [Веб-интерфейс]
+}
+
+package "Серверная часть" {
+    [API-сервер]
+    [Аутентификация]
+    [Отправка уведомлений]
+}
+
+database "База данных"
+
+cloud "Внешние сервисы" {
+    [Email / SMS]
+}
+
+user --> [Веб-интерфейс] : открывает\nв браузере
+
+[Веб-интерфейс] --> [API-сервер] : HTTP-запросы
+
+[API-сервер] --> [Аутентификация] : проверяет\nправа
+
+[API-сервер] --> [База данных] : SQL-запросы
+
+[API-сервер] --> [Отправка уведомлений] : событие\nизменения
+
+[Отправка уведомлений] --> [Email / SMS]
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml use-case-example
+title Пример: Диаграмма сценариев использования (Use Case)
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Покупатель"     as customer
+actor "Сотрудник"     as staff
+
+rectangle "Интернет-магазин" {
+    usecase "Просмотр каталога"  as UC1
+    usecase "Поиск товара"        as UC2
+    usecase "Создать заказ"       as UC3
+    usecase "Оплатить заказ"      as UC4
+    usecase "Обработать заказ"    as UC5
+    usecase "Отправить товар"     as UC6
+    usecase "Просмотр статистики" as UC7
+}
+
+customer --> UC1
+customer --> UC2
+customer --> UC3
+customer --> UC4
+
+staff --> UC5
+staff --> UC6
+staff --> UC7
+
+UC3 ..> UC4 : <<include>>
+
+@enduml
