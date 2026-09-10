@@ -164,9 +164,6 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-        mermaid.initialize({ startOnLoad: true, theme: 'default' });
-    </script>
 </head>
 <body>
     <div class="container">
@@ -287,30 +284,25 @@ admin --&gt; UC2<br>
 
         <div class="diagram-container">
             <div class="mermaid">
-                flowchart LR
-                customer(["Покупатель"])
-                staff(["Сотрудник"])
-
-                subgraph System["Интернет-магазин"]
-                UC1([Просмотр каталога])
-                UC2([Поиск товара])
-                UC3([Создать заказ])
-                UC4([Оплатить заказ])
-                UC5([Обработать заказ])
-                UC6([Отправить товар])
-                UC7([Просмотр статистики])
-                end
-
-                customer --> UC1
-                customer --> UC2
-                customer --> UC3
-                customer --> UC4
-
-                staff --> UC5
-                staff --> UC6
-                staff --> UC7
-
-                UC3 -.->|include| UC4
+flowchart LR
+    customer(["Покупатель"])
+    staff(["Сотрудник"])
+    subgraph System["Интернет-магазин"]
+        UC1([Просмотр каталога])
+        UC2([Поиск товара])
+        UC3([Создать заказ])
+        UC4([Оплатить заказ])
+        UC5([Обработать заказ])
+        UC6([Отправить товар])
+        UC7([Просмотр статистики])
+    end
+    customer --> UC1
+    customer --> UC2
+    customer --> UC3
+    customer --> UC4
+    staff --> UC5
+    staff --> UC6
+    staff --> UC7
             </div>
         </div>
 
@@ -381,12 +373,12 @@ flowchart TB
     end
 
     db[("База данных")]
-    cache[("Redis<br/>Кэш")]
+    cache[("Redis&lt;br/&gt;Кэш")]
     email>"Email / SMS"]
 
     user --> ui
 
-    ui -->|HTTP<br/>REST| api
+    ui -->|HTTP&lt;br/&gt;REST| api
     api --> auth
     api -->|SQL| db
     api -->|Кэш| cache
@@ -532,5 +524,37 @@ lab2/<br>
             <p>Курс: Архитектура современных информационных систем</p>
         </div>
     </div>
+
+    <script>
+        (function () {
+            // Ждём, пока библиотека Mermaid действительно загрузится.
+            // Это надёжнее, чем DOMContentLoaded/onload: сработает,
+            // даже если блок вставлен в уже загруженную страницу (например, в Тильде).
+            var attempts = 0;
+            var maxAttempts = 100; // ~10 секунд ожидания
+
+            function tryInitMermaid() {
+                attempts++;
+
+                if (typeof window.mermaid !== 'undefined') {
+                    window.mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+                    var nodes = document.querySelectorAll('.mermaid');
+                    if (window.mermaid.run) {
+                        window.mermaid.run({ nodes: nodes });
+                    } else if (window.mermaid.init) {
+                        window.mermaid.init(undefined, nodes);
+                    }
+                    return;
+                }
+
+                if (attempts < maxAttempts) {
+                    setTimeout(tryInitMermaid, 100);
+                }
+            }
+
+            tryInitMermaid();
+        })();
+    </script>
 </body>
 </html>
