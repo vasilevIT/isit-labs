@@ -1,0 +1,35 @@
+@startuml navigation
+title Схема навигации между экранами
+
+skinparam state {
+    BackgroundColor #EAF4FC
+    BorderColor #3498DB
+}
+
+[*] --> Login : открытие приложения
+
+state "Авторизация" as Login
+state "Главная страница\n(Дашборд)" as Dashboard
+state "Список задач" as TaskList
+state "Просмотр задачи" as TaskDetail
+state "Создание / редактирование\nзадачи" as TaskForm
+
+Login --> Dashboard : успешный вход
+
+Dashboard --> TaskList : раздел «Задачи»
+Dashboard --> TaskForm : «+ Создать задачу»
+
+TaskList --> TaskDetail : выбор задачи из списка
+TaskList --> TaskForm : «+ Создать задачу»
+TaskList --> Dashboard : раздел «Проекты» /\nглавная
+
+TaskDetail --> TaskList : «← Назад к списку задач»
+TaskDetail --> TaskForm : «Редактировать»
+
+TaskForm --> TaskList : «Сохранить» /\n«Отмена»
+
+Dashboard --> Login : «Выход»
+TaskList --> Login : «Выход»
+TaskDetail --> Login : «Выход»
+
+@enduml

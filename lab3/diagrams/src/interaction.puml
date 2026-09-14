@@ -1,0 +1,51 @@
+@startuml interaction
+title Диаграмма взаимодействия компонентов
+title Сценарий: создание и назначение задачи
+
+actor "Руководитель" as user
+participant "Frontend\n(SPA)" as web
+participant "API /\nКонтроллеры" as api
+participant "Сервис задач\n(бизнес-логика)" as service
+participant "Репозиторий\nзадач" as repo
+database "База данных" as db
+participant "Модуль\nуведомлений" as notify
+
+user -> web : заполняет форму\nновой задачи
+activate web
+
+web -> api : POST /api/tasks\n{project, assignee, title, ...}
+activate api
+
+api -> api : проверка прав\nдоступа (роль)
+api -> service : createTask(data)
+activate service
+
+service -> service : валидация\nвходных данных
+service -> repo : save(task)
+activate repo
+
+repo -> db : INSERT INTO tasks (...)
+activate db
+db --> repo : id новой задачи
+deactivate db
+
+repo --> service : Task
+deactivate repo
+
+service -> notify : событие\n"задача назначена"
+activate notify
+notify --> service : ok
+deactivate notify
+
+service --> api : Task (созданная задача)
+deactivate service
+
+api --> web : 201 Created\n{task}
+deactivate api
+
+web --> user : отображает\nновую задачу в списке
+deactivate web
+
+notify -> notify : отправка Email/Push\nответственному сотруднику
+
+@enduml
