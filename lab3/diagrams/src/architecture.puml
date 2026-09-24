@@ -1,0 +1,57 @@
+@startuml architecture
+title Диаграмма архитектуры — Система управления задачами команды
+title Трёхуровневая архитектура веб-приложения
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor #EAF4FC
+    BorderColor    #3498DB
+}
+skinparam database {
+    BackgroundColor #FDF2E9
+    BorderColor    #E67E22
+}
+skinparam actor {
+    BackgroundColor #FFFFFF
+}
+
+actor "Сотрудник"     as employee
+actor "Руководитель"  as manager
+actor "Администратор" as admin
+
+package "Frontend (клиентская часть)" {
+    [Веб-интерфейс\n(SPA)] as web
+}
+
+package "Backend (серверная часть)" {
+    [API / Роутинг]              as api
+    [Контроллеры]                 as controllers
+    [Бизнес-логика\n(Сервисы)]   as services
+    [Репозитории\n(доступ к данным)] as repositories
+    [Модуль аутентификации]      as auth
+    [Модуль уведомлений]         as notify
+}
+
+package "Database (база данных)" {
+    database "PostgreSQL" as db
+}
+
+cloud "Внешние сервисы" {
+    [Email / Push сервис] as email
+}
+
+employee --> web
+manager  --> web
+admin    --> web
+
+web --> api : HTTPS / REST (JSON)
+
+api --> auth        : проверка токена / прав
+api --> controllers : маршрутизация запроса
+controllers --> services     : вызов бизнес-логики
+services    --> repositories : запрос / изменение данных
+repositories --> db          : SQL-запросы
+services    --> notify       : событие изменения статуса
+notify      --> email        : Email / Push
+
+@enduml

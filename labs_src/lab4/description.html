@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №4 - Проектирование пользовательского интерфейса</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .meta-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .meta-info p {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        em {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лабораторная работа №4</h1>
+        <h2 style="margin-top: 0; color: #3498db; border: none;">Проектирование пользовательского интерфейса</h2>
+
+        <div class="meta-info">
+            <p><strong>Модуль:</strong> Архитектура современных информационных систем</p>
+            <p><strong>Тема:</strong> Архитектура веб-систем: клиент, сервер и API</p>
+            <p><strong>Продолжительность:</strong> 4 академических часа</p>
+        </div>
+
+        <h2>Цель лабораторной работы</h2>
+        <p>Изучить основные принципы проектирования пользовательских интерфейсов, разработать структуру экранов информационной системы, спроектировать навигацию и подготовить интерактивные или статические макеты страниц.</p>
+
+        <h2>Необходимое программное обеспечение</h2>
+        <ul>
+            <li>Git;</li>
+            <li>редактор интерфейсов (Figma, Penpot, Pixso или аналог) — либо PlantUML/Mermaid для текстовых wireframe-схем;</li>
+            <li>Visual Studio Code (или другой редактор Markdown);</li>
+            <li>веб-браузер.</li>
+        </ul>
+
+        <h2>Постановка задачи</h2>
+        <p>На основе архитектуры информационной системы необходимо разработать пользовательский интерфейс приложения. В ходе работы требуется:</p>
+        <ul>
+            <li>определить перечень экранов системы;</li>
+            <li>разработать структуру пользовательского интерфейса;</li>
+            <li>спроектировать навигацию между экранами;</li>
+            <li>подготовить макеты основных страниц информационной системы.</li>
+        </ul>
+        <p>При проектировании рекомендуется соблюдать базовые принципы UX/UI:</p>
+        <ul>
+            <li>единообразие оформления;</li>
+            <li>понятная навигация;</li>
+            <li>минимальное количество действий для выполнения основных операций;</li>
+            <li>адаптация интерфейса под различные роли пользователей.</li>
+        </ul>
+
+        <h2>Теоретическая база</h2>
+
+        <h3>1. Что такое UX и UI</h3>
+        <div class="section">
+            <p><strong>UI (User Interface)</strong> — пользовательский интерфейс: то, что пользователь видит на экране — кнопки, формы, таблицы, меню.</p>
+            <p><strong>UX (User Experience)</strong> — пользовательский опыт: то, насколько удобно, понятно и быстро пользователь достигает своей цели при работе с системой.</p>
+            <p>Хороший интерфейс не только красиво выглядит (UI), но и логично устроен: пользователь без подсказок понимает, куда нажать и что произойдёт (UX).</p>
+        </div>
+
+        <h3>2. Экран (screen) и его структура</h3>
+        <div class="section">
+            <p><strong>Экран</strong> — это отдельная страница или состояние интерфейса, которое видит пользователь (например, страница списка задач или форма создания задачи). Для каждого экрана важно определить:</p>
+            <ul>
+                <li><strong>назначение</strong> — какую задачу пользователя решает этот экран;</li>
+                <li><strong>элементы интерфейса</strong> — какие блоки на нём присутствуют (шапка, меню, таблица, форма);</li>
+                <li><strong>доступные действия</strong> — что пользователь может сделать на этом экране.</li>
+            </ul>
+        </div>
+
+        <h3>3. Прототипирование: Wireframe и Mockup</h3>
+        <div class="section">
+            <p><strong>Wireframe (каркас, low-fidelity)</strong> — упрощённый, схематичный макет экрана без цвета и стилизации. Показывает только расположение блоков (шапка, меню, таблица, кнопки) — то есть структуру, а не оформление. Используется на ранних этапах проектирования, когда важно быстро проверить логику расположения элементов.</p>
+            <p><strong>Mockup (макет, high-fidelity)</strong> — детализированный макет, близкий к финальному дизайну: с цветами, шрифтами, иконками. Используется, когда структура интерфейса уже согласована и нужно проработать визуальный стиль.</p>
+            <p>Для учебных целей достаточно подготовить wireframe-прототипы — это быстрее и позволяет сосредоточиться на структуре и логике интерфейса, а не на визуальном дизайне.</p>
+        </div>
+
+        <p><strong>Пример wireframe-прототипа экрана (абстрактный, интернет-магазин):</strong></p>
+        <div class="diagram-container">
+            <img src="data:image/png;base64,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" alt="Пример wireframe-прототипа" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+        </div>
+        <p>На этом прототипе видны типичные элементы экрана: шапка с навигацией, строка поиска, таблица с данными, кнопка основного действия. Такой макет легко подготовить с помощью PlantUML (расширение <code>salt</code>) или в специализированном инструменте (Figma, Penpot).</p>
+
+        <h3>4. Навигация между экранами</h3>
+        <div class="section">
+            <p><strong>Навигация</strong> — это способ перемещения пользователя между экранами системы. Схема навигации показывает, с какого экрана на какой можно перейти и какое действие пользователя вызывает этот переход (например, нажатие кнопки или пункта меню).</p>
+            <p>Хорошая навигация обычно строится вокруг одного «центрального» экрана (например, главной страницы), откуда пользователь может попасть в любой другой раздел, и предусматривает понятный путь «назад».</p>
+        </div>
+
+        <p><strong>Пример схемы навигации (абстрактный):</strong></p>
+        <div class="diagram-container">
+            <img src="data:image/png;base64,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" alt="Пример схемы навигации" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+        </div>
+        <p>На этой схеме:</p>
+        <ul>
+            <li><strong>Состояния</strong> (прямоугольники) — экраны системы;</li>
+            <li><strong>Стрелки</strong> — переходы между экранами;</li>
+            <li><strong>Подписи стрелок</strong> — действие пользователя, вызывающее переход (например, «выбор товара», «В корзину»).</li>
+        </ul>
+
+        <h2>Этапы выполнения</h2>
+
+        <h3>Шаг 1. Определение структуры экранов</h3>
+        <p>Определите перечень экранов будущей информационной системы. Для каждого экрана укажите: назначение, основные элементы интерфейса, доступные действия пользователя. Рекомендуется разработать не менее 5 экранов.</p>
+
+        <h3>Шаг 2. Проектирование навигации</h3>
+        <p>Определите, каким образом пользователь будет перемещаться между экранами. Подготовьте схему навигации, отражающую основные пользовательские сценарии.</p>
+
+        <h3>Шаг 3. Разработка прототипов</h3>
+        <p>Создайте прототипы основных экранов системы. Для каждого экрана рекомендуется предусмотреть: шапку приложения, меню навигации, рабочую область, элементы управления, формы ввода данных, кнопки основных действий. Допускается использование как низкодетализированных (Wireframe), так и высокодетализированных (Mockup) макетов.</p>
+
+        <h3>Шаг 4. Подготовка макетов страниц</h3>
+        <p>Разработайте макеты основных страниц системы. Рекомендуется подготовить макеты:</p>
+        <ul>
+            <li>страницы авторизации;</li>
+            <li>главной страницы;</li>
+            <li>страницы списка объектов;</li>
+            <li>страницы просмотра объекта;</li>
+            <li>страницы создания или редактирования объекта.</li>
+        </ul>
+
+        <h3>Шаг 5. Подготовка итогового отчёта</h3>
+        <p>Оформите результаты работы в виде Git-репозитория с использованием Markdown.</p>
+
+        <h2>Что должно получиться в результате</h2>
+        <ul>
+            <li>перечень экранов информационной системы;</li>
+            <li>схема навигации между экранами;</li>
+            <li>прототипы основных страниц;</li>
+            <li>макеты пользовательского интерфейса;</li>
+            <li>краткое описание принятых решений по организации интерфейса.</li>
+        </ul>
+
+        <h2>Домашняя доработка</h2>
+        <ul>
+            <li>доработать схему;</li>
+            <li>добавить описание API;</li>
+            <li>подготовить проект к следующей лабораторной работе.</li>
+        </ul>
+
+        <h2>Требования к оформлению</h2>
+        <p>Результаты лабораторной работы должны быть оформлены в виде Git-репозитория.</p>
+        <p><strong>Рекомендуемая структура:</strong></p>
+        <div class="code-block">lab4/
+├── README.md
+├── diagrams/
+├── images/
+└── design/</div>
+
+        <p><strong>Файл README.md</strong> должен содержать:</p>
+        <ul>
+            <li>название лабораторной работы;</li>
+            <li>цель работы;</li>
+            <li>описание структуры пользовательского интерфейса;</li>
+            <li>описание навигации между экранами;</li>
+            <li>макеты и прототипы страниц;</li>
+            <li>вывод.</li>
+        </ul>
+
+        <p>При необходимости в репозиторий добавляются:</p>
+        <ul>
+            <li>схемы навигации (<code>diagrams/</code>);</li>
+            <li>изображения макетов (<code>images/</code>);</li>
+            <li>исходные файлы проекта Figma, Penpot и др. (<code>design/</code>).</li>
+        </ul>
+
+        <p>При оформлении рекомендуется:</p>
+        <ul>
+            <li>использовать язык разметки Markdown;</li>
+            <li>применять заголовки, списки и таблицы;</li>
+            <li>сопровождать макеты кратким описанием;</li>
+            <li>придерживаться понятной структуры каталогов и файлов.</li>
+        </ul>
+
+        <div class="footer">
+            <p>Лабораторная работа №4 — Проектирование пользовательского интерфейса</p>
+            <p>Курс: Архитектура современных информационных систем</p>
+        </div>
+    </div>
+</body>
+</html>
