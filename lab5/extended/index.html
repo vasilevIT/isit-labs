@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Система управления задачами</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ===== Экран 1. Вход в систему ===== -->
+  <div id="login-screen" class="container" style="max-width: 400px;">
+    <form id="login-form" class="card">
+      <h1>Вход в систему</h1>
+
+      <label for="login-email">Email</label>
+      <input id="login-email" type="text" value="anna@example.com">
+      <div class="error" id="error-email"></div>
+
+      <label for="login-password">Пароль</label>
+      <input id="login-password" type="password" value="123456">
+      <div class="error" id="error-password"></div>
+
+      <div class="error" id="error-login"></div>
+      <button type="submit" id="login-button" class="primary">Войти</button>
+    </form>
+  </div>
+
+  <!-- ===== Экран 2. Список задач ===== -->
+  <div id="main-screen" hidden>
+    <div class="topbar">
+      <strong>Задачи команды</strong>
+      <span>
+        <span id="user-name"></span>
+        <button id="logout-button">Выйти</button>
+      </span>
+    </div>
+
+    <div class="container">
+
+      <!-- Форма создания задачи -->
+      <form id="task-form" class="card">
+        <h2>Новая задача</h2>
+
+        <label for="task-title">Название</label>
+        <input id="task-title" type="text">
+        <div class="error" id="error-title"></div>
+
+        <label for="task-description">Описание</label>
+        <textarea id="task-description"></textarea>
+
+        <label for="task-priority">Приоритет</label>
+        <select id="task-priority">
+          <option value="low">Низкий</option>
+          <option value="medium" selected>Средний</option>
+          <option value="high">Высокий</option>
+        </select>
+
+        <label for="task-date">Срок выполнения</label>
+        <input id="task-date" type="date">
+        <div class="error" id="error-date"></div>
+
+        <div class="error" id="error-form"></div>
+        <button type="submit" id="task-button" class="primary">Создать задачу</button>
+      </form>
+
+      <!-- Фильтры -->
+      <h2>Список задач</h2>
+      <div class="toolbar">
+        <select id="status-filter">
+          <option value="">Все статусы</option>
+          <option value="new">Новая</option>
+          <option value="in_progress">В работе</option>
+          <option value="done">Выполнена</option>
+        </select>
+        <input id="search-input" type="text" placeholder="Поиск по названию...">
+        <button id="refresh-button">Обновить</button>
+      </div>
+
+      <!-- Здесь показываются «Загрузка…», «Ничего не найдено» и ошибки -->
+      <div id="message" class="message" hidden></div>
+
+      <!-- Таблицу заполняет JavaScript -->
+      <table id="task-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Название</th>
+            <th>Статус</th>
+            <th>Приоритет</th>
+            <th>Срок</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="task-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Скрипты подключаются в конце страницы, когда вся разметка уже загружена -->
+  <script src="js/mock-api.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
