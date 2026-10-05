@@ -1,0 +1,154 @@
+/* Готовое оформление. Менять не обязательно. */
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  color: #222;
+  margin: 0;
+}
+
+/* Содержимое по центру страницы */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Белая карточка */
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Поля форм */
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+input, select, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  margin-top: 4px;
+  font-size: 16px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+/* Сообщение об ошибке под полем (красный текст) */
+.error {
+  color: #c0392b;
+  font-size: 14px;
+  min-height: 18px;
+}
+
+/* Кнопки */
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #2f80c9;
+  border-color: #2f80c9;
+  color: white;
+}
+
+button.danger {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Строка с фильтрами */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Таблица */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #eef1f5;
+}
+
+/* Сообщения «Загрузка…», «Ничего не найдено», ошибки */
+.message {
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  background: #e8f0f8;
+}
+
+.message.error-message {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+/* Верхняя панель */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Нужно, чтобы атрибут hidden скрывал элементы */
+[hidden] {
+  display: none !important;
+}
+
+/* Выполненная задача: зачёркнутый серый текст (класс добавляется из JavaScript) */
+tr.done td {
+  text-decoration: line-through;
+  color: #888;
+}
+
+/* Кнопки в ячейке таблицы и счётчик */
+td button {
+  padding: 4px 10px;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+#counter {
+  font-size: 18px;
+}
+
+/* Строка фильтров: поля растягиваются, текст кнопки не переносится */
+.toolbar select,
+.toolbar input {
+  flex: 1;
+  margin-top: 0;
+}
+
+.toolbar button {
+  white-space: nowrap;
+}

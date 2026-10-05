@@ -1,0 +1,18 @@
+{
+  "_required": {
+    "tasks": ["title"]
+  },
+  "users": [
+    { "id": 1, "name": "Анна Петрова", "email": "anna@example.com", "role": "manager" },
+    { "id": 2, "name": "Иван Сидоров", "email": "ivan@example.com", "role": "executor" }
+  ],
+  "tasks": [
+    { "id": 1, "title": "Сверстать главную страницу", "description": "По макету из Figma", "status": "done", "priority": "high", "dueDate": "2026-10-01", "createdAt": "2026-09-20T09:00:00.000Z" },
+    { "id": 2, "title": "Подключить форму обратной связи", "description": "Отправка заявки на почту менеджера", "status": "in_progress", "priority": "medium", "dueDate": "2026-10-10", "createdAt": "2026-09-21T10:30:00.000Z" },
+    { "id": 3, "title": "Написать тексты для раздела «О нас»", "description": "", "status": "new", "priority": "low", "dueDate": "2026-10-15", "createdAt": "2026-09-22T11:00:00.000Z" },
+    { "id": 4, "title": "Спроектировать экран авторизации", "description": "Вход по email и паролю", "status": "done", "priority": "high", "dueDate": "2026-09-28", "createdAt": "2026-09-18T08:15:00.000Z" },
+    { "id": 5, "title": "Реализовать список заказов", "description": "Фильтр по статусу", "status": "in_progress", "priority": "high", "dueDate": "2026-10-12", "createdAt": "2026-09-23T12:00:00.000Z" },
+    { "id": 6, "title": "Настроить уведомления", "description": "Сообщать об изменении статуса", "status": "new", "priority": "medium", "dueDate": "2026-10-25", "createdAt": "2026-09-24T14:20:00.000Z" },
+    { "id": 7, "title": "Собрать требования у отдела кадров", "description": "Встреча в четверг", "status": "new", "priority": "medium", "dueDate": "2026-10-08", "createdAt": "2026-09-25T09:40:00.000Z" }
+  ]
+}
