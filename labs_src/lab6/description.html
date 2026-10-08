@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №6 - Разработка серверной части приложения</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .meta-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .meta-info p {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        em {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лабораторная работа №6</h1>
+        <h2 style="margin-top: 0; color: #3498db; border: none;">Разработка серверной части приложения</h2>
+
+        <div class="meta-info">
+            <p><strong>Модуль:</strong> Разработка web приложений</p>
+            <p><strong>Тема:</strong> Современная разработка веб-приложений</p>
+            <p><strong>Продолжительность:</strong> 4 академических часа</p>
+        </div>
+
+        <h2>Цель лабораторной работы</h2>
+        <p>Изучить основы разработки серверной части веб-приложений на PHP, создать структуру проекта, реализовать маршрутизацию HTTP-запросов и разработать контроллеры для обработки запросов пользователей.</p>
+        <p>Опыт программирования на PHP не требуется: в работе есть готовая заготовка, подробные подсказки в комментариях и шпаргалка по синтаксису.</p>
+
+        <h2>Необходимое программное обеспечение</h2><ul><li>Git;</li><li>PHP 8.2 или выше;</li><li>Visual Studio Code (или другой редактор кода);</li><li>веб-сервер (Apache, Nginx или встроенный сервер PHP): в работе используется встроенный сервер PHP, устанавливать ничего дополнительно не нужно;</li><li>веб-браузер с инструментами разработчика (клавиша F12).</li></ul><p><strong>Проверка установки:</strong> в терминале выполните <code>php -v</code>. Должна появиться строка вида <code>PHP 8.2.xx</code> (или новее). Если команда не найдена, PHP не установлен или не добавлен в переменную PATH: выполните <strong>необязательный Шаг 0А</strong> («Установка PHP») ниже или обратитесь к преподавателю.</p>
+
+        <h2>Постановка задачи</h2>
+        <p>На основе ранее разработанной архитектуры информационной системы необходимо создать основу серверной части приложения.</p>
+        <p>В ходе работы требуется:</p><ul><li>создать структуру PHP-проекта;</li><li>реализовать механизм маршрутизации HTTP-запросов;</li><li>разработать контроллеры для обработки запросов;</li><li>организовать передачу данных между маршрутизатором и контроллерами.</li></ul>
+        <p>В качестве архитектурного подхода используется паттерн MVC (Model–View–Controller), с которым вы познакомились на лекции.</p>
+        <div class="highlight">
+            <p><strong>Что будет и чего не будет в этой работе.</strong> Сервер отвечает <strong>HTML-страницами</strong>: главная, список, просмотр, форма создания. Данные хранятся в обычном JSON-файле (<code>storage/tasks.json</code>), поэтому работа с ними уже написана в готовых классах-моделях. База данных будет позже, на лекции 2.2. Формат JSON для REST API вы разработаете в следующей лабораторной работе.</p>
+            <p>Заготовка содержит примеры на «Системе управления задачами» (задачи и проекты). Сначала вы собираете приложение на этом примере, а затем (<strong>Шаг 5</strong>) переносите его на <strong>свою предметную область</strong> из лабораторной работы №1.</p>
+            <p>Часть кода уже написана и подробно прокомментирована: модели, все шаблоны страниц, форма создания, а в маршрутизаторе поиск подходящего маршрута. Ваша задача <strong>разобраться</strong> в готовом коде и написать недостающее: точку входа, регистрацию маршрутов, страницу 404 и контроллеры. При защите нужно уметь объяснить любой файл проекта.</p>
+        </div>
+
+        <h2>Теоретическая база</h2>
+
+        <h3>1. Как PHP-приложение отвечает на запрос</h3>
+        <div class="section">
+            <p>Когда вы открываете в браузере адрес <code>http://localhost:8000/tasks/5</code>, происходит следующее:</p><ol><li>браузер отправляет на сервер <strong>HTTP-запрос</strong>: метод (<code>GET</code>) и адрес (<code>/tasks/5</code>);</li><li>веб-сервер запускает PHP-программу;</li><li>программа формирует ответ: код состояния (например, <code>200</code> или <code>404</code>) и содержимое (HTML-страницу);</li><li>сервер отправляет ответ браузеру, и работа программы <strong>полностью завершается</strong>.</li></ol>
+            <div class="highlight">
+                <p><strong>Важно запомнить:</strong> PHP запускается заново на каждый запрос и «забывает» всё после ответа. Значения переменных между двумя запросами не сохраняются. Поэтому данные, которые должны жить дольше одного запроса (созданные задачи), хранят в файле или базе данных. В нашей работе это файл <code>storage/tasks.json</code>.</p>
+            </div>
+        </div>
+
+        <h3>2. Единая точка входа и встроенный сервер</h3>
+        <div class="section">
+            <p>В современных приложениях все запросы направляются в <strong>один файл</strong> <code>public/index.php</code>. Он называется <em>front controller</em> («передний контроллер»). Дальше уже PHP-код решает, что делать с каждым адресом. Так не нужно создавать отдельный файл для каждой страницы.</p>
+            <p>Запуск встроенного сервера PHP (команды выполняются в терминале в папке <code>lab6/src</code>):</p><div class="code-block">php -S localhost:8000 -t public</div>
+            <p>Ключ <code>-S</code> запускает сервер на адресе <code>localhost:8000</code>, а <code>-t public</code> говорит, что «наружу» открыта только папка <code>public</code>. Так остальные файлы (модели, данные, настройки) недоступны по прямому адресу, а это защита. Сервер нужно оставить работать в терминале; остановить его можно клавишами <code>Ctrl+C</code>. Каждый запрос он печатает в терминале, а ошибки PHP выводятся и на странице, и в терминале.</p>
+            <p>Перезапускать сервер после правки кода <strong>не нужно</strong>: PHP читает файлы заново на каждый запрос, достаточно обновить страницу в браузере.</p>
+        </div>
+
+        <h3>3. Шпаргалка по PHP</h3>
+        <div class="section">
+            <p>Вам понадобится немного синтаксиса. Все примеры ниже встречаются в заготовке.</p><div class="code-block">// Всё, что после двух косых черт, — комментарий.
+
+// ----- Переменные и вывод -----
+$name = &#x27;Анна&#x27;;                      // переменная всегда начинается со знака $
+$count = 5;
+echo &#x27;Привет, &#x27; . $name . &#x27;!&#x27;;       // склейка строк делается точкой
+echo &quot;Задач: $count&quot;;                // в двойных кавычках имя переменной подставляется само
+
+// ----- Массивы -----
+$task = [&#x27;id&#x27; =&gt; 1, &#x27;title&#x27; =&gt; &#x27;Сверстать страницу&#x27;];      // ассоциативный массив: «ключ =&gt; значение»
+echo $task[&#x27;title&#x27;];                                         // обращение по ключу в квадратных скобках
+
+$tasks = [$task, [&#x27;id&#x27; =&gt; 2, &#x27;title&#x27; =&gt; &#x27;Написать тесты&#x27;]];  // список из двух массивов
+echo count($tasks);                                          // 2 — сколько элементов
+
+// ----- Цикл и условие -----
+foreach ($tasks as $item) {          // «для каждого элемента списка»
+    echo $item[&#x27;title&#x27;] . &quot;\n&quot;;
+}
+
+if ($count &gt; 3) {
+    echo &#x27;Много&#x27;;
+} elseif ($count === 0) {            // три знака = означают «равно»
+    echo &#x27;Ноль&#x27;;
+} else {
+    echo &#x27;Мало&#x27;;
+}
+
+// ----- Значение по умолчанию -----
+$status = $_GET[&#x27;status&#x27;] ?? &#x27;&#x27;;     // ?? — «если параметра нет, возьми значение справа»
+
+// ----- Функции -----
+function sum(int $a, int $b): int    // типы параметров и результата
+{
+    return $a + $b;
+}
+echo sum(2, 3);                      // 5
+
+// ----- Класс и объект -----
+class Greeter
+{
+    public function hello(string $name): string
+    {
+        return &quot;Привет, $name!&quot;;
+    }
+}
+$greeter = new Greeter();            // создали объект
+echo $greeter-&gt;hello(&#x27;Анна&#x27;);        // вызвали метод объекта через -&gt;</div>
+            <p>Файл с PHP-кодом начинается с <code>&lt;?php</code>. Часть <code>namespace App\Controllers;</code> вверху файла задаёт «адрес» класса, а <code>use App\Models\TaskRepository;</code> позволяет в коде писать короткое имя <code>TaskRepository</code> вместо полного. Файл с классом должен лежать в папке, которая соответствует его пространству имён (<code>App\Controllers\TaskController</code> находится в <code>app/Controllers/TaskController.php</code>): по этому правилу готовая автозагрузка находит классы без <code>require</code>.</p>
+        </div>
+
+        <h3>4. Маршрутизация</h3>
+        <div class="section">
+            <p><strong>Маршрут</strong> — это правило «на такой запрос отвечает такой код». Маршрут состоит из метода (<code>GET</code> или <code>POST</code>), шаблона адреса и обработчика: класса-контроллера и его метода. Все маршруты собраны в одной таблице, <code>routes/web.php</code>:</p><div class="code-block">$router-&gt;get(&#x27;/&#x27;, [HomeController::class, &#x27;index&#x27;]);
+$router-&gt;get(&#x27;/tasks&#x27;, [TaskController::class, &#x27;index&#x27;]);
+$router-&gt;get(&#x27;/tasks/{id}&#x27;, [TaskController::class, &#x27;show&#x27;]);
+$router-&gt;post(&#x27;/tasks&#x27;, [TaskController::class, &#x27;store&#x27;]);</div>
+            <p>Читается так: «запрос <code>GET /tasks/5</code> обрабатывает метод <code>show</code> класса <code>TaskController</code>». Фигурные скобки в <code>{id}</code> означают «здесь может быть любое значение»: оно передаётся в метод как параметр с тем же именем (<code>show(string $id)</code>).</p>
+            <p>Работа маршрутизатора (класс <code>Router</code>) складывается из четырёх действий:</p><ol><li><strong>регистрация:</strong> методы <code>get()</code> и <code>post()</code> запоминают маршруты в списке;</li><li><strong>поиск:</strong> для пришедшего запроса маршруты просматриваются <strong>по порядку</strong>, берётся первый, у которого совпали метод и адрес;</li><li><strong>вызов:</strong> создаётся объект контроллера и вызывается нужный метод, ему передаются параметры из адреса;</li><li><strong>ошибка:</strong> если ни один маршрут не подошёл, возвращается страница <code>404</code>.</li></ol>
+            <div class="highlight">
+                <p><strong>Порядок маршрутов важен.</strong> Адрес <code>/tasks/create</code> подходит и к маршруту <code>/tasks/create</code>, и к маршруту <code>/tasks/{id}</code> (слово <code>create</code> сойдёт за значение <code>id</code>). Побеждает тот, что записан раньше. Поэтому конкретные адреса пишут <strong>выше</strong> шаблонных.</p>
+            </div>
+        </div>
+
+        <h3>5. Паттерн MVC</h3>
+        <div class="section">
+            <p>MVC делит приложение на три роли, и у каждой своя папка:</p><table>
+<thead><tr><th>Роль</th><th>За что отвечает</th><th>Где находится</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td><strong>Model</strong> (модель)</td><td>данные и работа с ними: прочитать, найти, сохранить</td><td><code>app/Models/</code></td><td><code>TaskRepository</code>: методы <code>all()</code>, <code>find()</code>, <code>add()</code></td></tr>
+<tr><td><strong>View</strong> (представление)</td><td>внешний вид: HTML-шаблон, в который подставляются данные</td><td><code>app/Views/</code></td><td><code>tasks/index.php</code>: таблица задач</td></tr>
+<tr><td><strong>Controller</strong> (контроллер)</td><td>принимает запрос, берёт данные у модели, выбирает шаблон и передаёт ему данные</td><td><code>app/Controllers/</code></td><td><code>TaskController::show()</code></td></tr>
+</tbody>
+</table>
+            <p>Цепочка обработки запроса <code>GET /tasks/5</code>:</p><div class="code-block">Браузер  -&gt;  public/index.php  -&gt;  Router  -&gt;  TaskController::show(&#x27;5&#x27;)
+                                                  |        ^
+                                          TaskRepository   | (данные задачи)
+                                                  v        |
+                                        Views/tasks/show.php (HTML)  -&gt;  Браузер</div>
+            <p>Благодаря такому разделению можно менять одну часть, не трогая другие: например, заменить файл базой данных (меняется только модель) или переверстать страницу (меняется только шаблон).</p>
+        </div>
+
+        <h3>6. Контроллеры</h3>
+        <div class="section">
+            <p>Контроллер — это обычный PHP-класс, в котором каждый метод обрабатывает один запрос (такой метод называют <em>action</em>, «действие»). Внутри он делает три вещи: <strong>(1)</strong> читает данные запроса, <strong>(2)</strong> обращается к моделям, <strong>(3)</strong> показывает шаблон.</p><div class="code-block">// GET /tasks/5   — значение {id} из маршрута приходит в параметр $id
+public function show(string $id): void
+{
+    $task = $this-&gt;tasks-&gt;find((int) $id);     // (2) спросили у модели; (int) превращает &#x27;5&#x27; в число 5
+    if ($task === null) {
+        notFound();                            // задачи нет: страница 404 с кодом ответа 404
+    }
+    view(&#x27;tasks/show&#x27;, [&#x27;task&#x27; =&gt; $task]);     // (3) показали шаблон и передали ему данные
+}</div>
+            <p>Откуда контроллер берёт данные запроса:</p><table>
+<thead><tr><th>Источник</th><th>Что содержит</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td>параметры маршрута</td><td>значения из <code>{id}</code></td><td><code>show(string $id)</code></td></tr>
+<tr><td><code>$_GET</code></td><td>параметры из адреса после знака <code>?</code></td><td><code>/tasks?status=done</code> даёт <code>$_GET['status']</code></td></tr>
+<tr><td><code>$_POST</code></td><td>поля отправленной формы</td><td><code>$_POST['title']</code></td></tr>
+</tbody>
+</table></div>
+
+        <h3>7. Представления: PHP внутри HTML</h3>
+        <div class="section">
+            <p>Шаблон — это HTML-файл, в который вставлены фрагменты PHP. Три конструкции, которые нужны в работе:</p><div class="code-block">&lt;h1&gt;&lt;?= e($task[&#x27;title&#x27;]) ?&gt;&lt;/h1&gt;                 &lt;!-- вывести значение --&gt;
+
+&lt;?php foreach ($tasks as $task): ?&gt;               &lt;!-- цикл: блок повторится для каждой задачи --&gt;
+  &lt;li&gt;&lt;?= e($task[&#x27;title&#x27;]) ?&gt;&lt;/li&gt;
+&lt;?php endforeach; ?&gt;
+
+&lt;?php if (count($tasks) === 0): ?&gt;                &lt;!-- условие --&gt;
+  &lt;p&gt;Задач нет.&lt;/p&gt;
+&lt;?php endif; ?&gt;</div>
+            <div class="highlight">
+                <p><strong>Безопасность.</strong> Любое значение, пришедшее от пользователя, выводится только через функцию <code>e(...)</code>. Она заменяет символы <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code> на безопасные коды. Иначе пользователь может ввести в форму «название» <code>&lt;script&gt;...&lt;/script&gt;</code>, и этот скрипт выполнится в браузере каждого, кто откроет страницу (XSS-атака).</p>
+            </div>
+            <p>Общая «рамка» страниц (шапка и подвал) вынесена в <code>Views/layout/</code>, поэтому в каждом шаблоне пишется только содержимое страницы. Данные в шаблон передаёт функция <code>view('имя_шаблона', ['переменная' => значение])</code>.</p>
+        </div>
+
+        <h3>8. Формы, коды ответа и перенаправление</h3>
+        <div class="section">
+            <p>Страницы открываются запросом <code>GET</code>, а форма отправляет данные запросом <code>POST</code>. Поэтому для одного адреса <code>/tasks</code> есть два маршрута: <code>GET</code> (показать список) и <code>POST</code> (принять форму). После успешной обработки формы сервер не показывает страницу сам, а <strong>перенаправляет</strong> браузер на список. Иначе обновление страницы (F5) повторно отправило бы форму и создало дубликат.</p><table>
+<thead><tr><th>Код</th><th>Название</th><th>Когда используется в работе</th></tr></thead>
+<tbody>
+<tr><td><code>200</code></td><td>OK</td><td>страница успешно показана</td></tr>
+<tr><td><code>302</code></td><td>Found (перенаправление)</td><td>после успешного сохранения формы: «перейдите на /tasks»</td></tr>
+<tr><td><code>404</code></td><td>Not Found</td><td>нет маршрута или объекта с таким номером</td></tr>
+<tr><td><code>422</code></td><td>Unprocessable Entity</td><td>данные формы не прошли проверку</td></tr>
+<tr><td><code>500</code></td><td>Internal Server Error</td><td>ошибка в коде программы</td></tr>
+</tbody>
+</table></div>
+
+        <h3>9. Как проверять сервер</h3>
+        <div class="section">
+            <p>В лабораторной работе №5 запросы шли в «мок» внутри браузера, и вкладка Network их не показывала. Теперь запросы настоящие, поэтому все инструменты работают:</p><table>
+<thead><tr><th>Инструмент</th><th>Что показывает</th></tr></thead>
+<tbody>
+<tr><td>браузер, вкладка <strong>Network</strong> (F12)</td><td>адрес, метод и <strong>код ответа</strong> каждого запроса, заголовки и тело ответа. Для перенаправления видно два запроса подряд: <code>302</code> и затем <code>200</code></td></tr>
+<tr><td>терминал с работающим сервером</td><td>строка на каждый запрос (адрес и код ответа) и сообщения об ошибках PHP</td></tr>
+<tr><td>команда <code>curl -i адрес</code></td><td>ответ сервера вместе с кодом и заголовками, без браузера</td></tr>
+</tbody>
+</table><div class="code-block">curl -i http://localhost:8000/tasks/5          # заголовки (первая строка с кодом) и страница
+curl -i http://localhost:8000/nonexistent      # должен вернуть HTTP/1.1 404 Not Found
+curl -i -X POST -d &quot;title=Да&quot; http://localhost:8000/tasks     # отправка формы без браузера</div></div>
+
+        <h3>10. Как искать ошибки и не наделать их</h3>
+        <div class="section">
+            <p><strong>Правила, которые убирают половину ошибок:</strong></p><ol><li>Файл PHP начинается с <code>&lt;?php</code> в <strong>самой первой строке</strong>: ни пробела, ни пустой строки перед ним (иначе позже появится ошибка «headers already sent»).</li><li>Каждая команда заканчивается точкой с запятой <code>;</code>. Скобки <code>( )</code>, <code>{ }</code>, <code>[ ]</code> и кавычки всегда парные: редактор подсвечивает парную скобку, проверяйте её.</li><li>Регистр букв важен: <code>TaskController.php</code> и <code>taskcontroller.php</code> разные файлы, <code>$task</code> и <code>$Task</code> разные переменные. Имя файла с классом совпадает с именем класса.</li><li>После изменения сохраните файл (Ctrl+S или Cmd+S) и обновите страницу (F5). Перезапускать сервер не нужно.</li><li>Делайте и проверяйте по одному заданию: выполнили <code>TODO</code> → проверили строку «✔ Проверка» в комментарии → только потом следующее. Не пишите сразу всё.</li><li>Раскомментируя код из подсказки, убирайте <code>//</code> у <strong>всего</strong> фрагмента: вместе с закрывающими <code>}</code> и <code>]);</code>, иначе скобки окажутся непарными.</li></ol>
+            <p><strong>Как читать сообщение об ошибке.</strong> PHP показывает ошибки на странице и в терминале, где запущен сервер. Образец:</p><div class="code-block">Fatal error: Uncaught Error: Call to undefined function view() in /путь/к/проекту/public/index.php on line 7</div><table>
+<thead><tr><th>Часть сообщения</th><th>Что означает</th></tr></thead>
+<tbody>
+<tr><td><code>Fatal error</code></td><td>фатальная ошибка: программа остановлена (для предупреждений будет <code>Warning</code>: программа продолжает работать, но результат может быть неверным)</td></tr>
+<tr><td><code>Call to undefined function view()</code></td><td>суть: вызвана функция <code>view()</code>, которой нет. Причина: не подключён файл <code>app/helpers.php</code> или опечатка в имени</td></tr>
+<tr><td><code>index.php on line 7</code></td><td>где искать: файл и номер строки. Откройте эту строку и две-три строки выше</td></tr>
+</tbody>
+</table>
+            <p>Другие частые сообщения того же вида:</p><table>
+<thead><tr><th>Сообщение</th><th>Что случилось</th></tr></thead>
+<tbody>
+<tr><td><code>Warning: Undefined array key "project_id"</code></td><td>обращение к элементу массива, которого нет: опечатка в ключе или в массиве другие данные</td></tr>
+<tr><td><code>Fatal error: Uncaught Error: Unknown named parameter $task_id</code></td><td>имя параметра метода контроллера не совпадает с именем в фигурных скобках маршрута</td></tr>
+</tbody>
+</table><ol><li>Прочитайте <strong>первую</strong> строку сообщения (остальное вам пока не нужно).</li><li>Найдите в ней файл и номер строки.</li><li>Откройте строку и 2–3 строки выше: ошибка часто находится сразу перед указанным местом (например, забыта <code>;</code>).</li><li>Сравните свой код с подсказкой или готовым образцом буква в букву.</li><li>Не получилось за 10 минут: позовите преподавателя и покажите <strong>текст ошибки</strong>.</li></ol>
+            <p><strong>Если сообщений нет, а страница пустая или результат неверный.</strong> В JavaScript вы выводили значения через <code>console.log</code>. В PHP то же самое делает <code>var_dump</code> (покажет значение и его тип). Добавьте в нужное место контроллера строку и обновите страницу:</p><div class="code-block">echo &#x27;&lt;pre&gt;&#x27;; var_dump($task); echo &#x27;&lt;/pre&gt;&#x27;; exit;</div>
+            <p>На странице появится содержимое переменной (<code>exit;</code> останавливает программу сразу после вывода, чтобы вы его увидели):</p><div class="code-block">array(3) {
+  &#x27;id&#x27; =&gt;
+  int(3)
+  &#x27;title&#x27; =&gt;
+  string(12) &quot;Пример&quot;
+  &#x27;status&#x27; =&gt;
+  string(3) &quot;new&quot;
+}</div>
+            <p><strong>Обязательно удалите эту строку</strong> после проверки: иначе страница не будет работать дальше.</p>
+            <p><strong>Куда смотреть, если что-то не так:</strong></p><table>
+<thead><tr><th>Что видите</th><th>В каком файле искать</th></tr></thead>
+<tbody>
+<tr><td>пустая страница на всех адресах</td><td><code>public/index.php</code> (не вызван <code>dispatch()</code>, остался <code>echo</code>-заглушка) и терминал сервера</td></tr>
+<tr><td>страница 404 на адресе, который должен работать</td><td><code>routes/web.php</code> (нет маршрута, неверный адрес или метод) и порядок маршрутов</td></tr>
+<tr><td>пустая страница на нужном адресе, ошибок нет</td><td>метод контроллера (пустой, не вызван <code>view()</code>) и маршрут (тот ли метод указан)</td></tr>
+<tr><td>страница есть, но без данных или с ошибкой «Undefined variable»</td><td>контроллер: передал ли он данные в <code>view()</code> и под теми ли именами, что ждёт шаблон</td></tr>
+<tr><td>страница выглядит неверно</td><td>шаблон в <code>app/Views/</code> и стили</td></tr>
+<tr><td><code>Class ... not found</code></td><td>имя класса, <code>namespace</code> в начале файла и расположение файла в папке</td></tr>
+</tbody>
+</table></div>
+
+        <h2>Структура заготовки проекта</h2>
+
+        <div class="code-block">src/
+├── public/                       # единственная папка, доступная из интернета
+│   ├── index.php                 # единая точка входа            -&gt; дописать (Шаг 1)
+│   └── css/style.css             # оформление (ГОТОВО)
+├── app/
+│   ├── autoload.php              # автозагрузка классов (ГОТОВО)
+│   ├── helpers.php               # функции e(), view(), redirect(), notFound(), config() (ГОТОВО)
+│   ├── Core/
+│   │   └── Router.php            # маршрутизатор: add() и 404    -&gt; дописать (Шаг 2), остальное ГОТОВО
+│   ├── Controllers/
+│   │   ├── HomeController.php    # главная                       -&gt; написать (Шаг 3)
+│   │   ├── TaskController.php    # задачи: index, show           -&gt; написать (Шаг 3); create и store (ГОТОВО)
+│   │   └── ProjectController.php # проекты                       -&gt; написать самостоятельно (Шаг 3)
+│   ├── Models/
+│   │   ├── TaskRepository.php    # работа с данными задач (ГОТОВО)
+│   │   └── ProjectRepository.php # работа с данными проектов (ГОТОВО)
+│   └── Views/
+│       ├── layout/               # шапка и подвал страниц (ГОТОВО)
+│       ├── errors/               # страницы 404 и 500 (ГОТОВО)
+│       ├── tasks/index.php       # список задач (ГОТОВО, образец шаблона)
+│       ├── tasks/create.php      # форма создания (ГОТОВО)
+│       ├── tasks/show.php        # просмотр задачи (ГОТОВО)
+│       ├── projects/             # index.php и show.php (ГОТОВО)
+│       └── home.php              # главная страница (ГОТОВО)
+├── routes/
+│   └── web.php                   # таблица маршрутов             -&gt; дописать (Шаг 2)
+├── config/
+│   └── app.php                   # настройки (название системы) (ГОТОВО)
+└── storage/
+    ├── tasks.json                # данные задач (ГОТОВО)
+    └── projects.json             # данные проектов (ГОТОВО)</div>
+        <p>Назначение каталогов (эту таблицу своими словами нужно будет описать в отчёте):</p><table>
+<thead><tr><th>Каталог</th><th>Для чего</th></tr></thead>
+<tbody>
+<tr><td><code>public/</code></td><td>точка входа и статические файлы (стили, картинки): всё, что открывается по прямому адресу</td></tr>
+<tr><td><code>app/Controllers/</code></td><td>контроллеры: обработка запросов</td></tr>
+<tr><td><code>app/Models/</code></td><td>модели: данные и работа с ними</td></tr>
+<tr><td><code>app/Views/</code></td><td>шаблоны страниц</td></tr>
+<tr><td><code>app/Core/</code></td><td>ядро приложения: маршрутизатор</td></tr>
+<tr><td><code>routes/</code></td><td>таблица маршрутов</td></tr>
+<tr><td><code>config/</code></td><td>настройки приложения</td></tr>
+<tr><td><code>storage/</code></td><td>файлы с данными</td></tr>
+</tbody>
+</table>
+
+        <h2>Этапы выполнения</h2>
+
+        <p>Работа выполняется на готовой заготовке по шагам. После каждого шага рекомендуется делать коммит в Git. Все задания помечены в коде словом <code>TODO</code> с номером шага, а после каждого задания в комментарии есть строка «✔ Проверка»: выполните её, прежде чем идти дальше. Задания можно найти так: найти их можно поиском по проекту в VS Code (Ctrl+Shift+F или Cmd+Shift+F). Подсказки в комментариях содержат почти готовый код, но вам нужно разобраться, что он делает: именно по этому будут задавать вопросы при защите.</p>
+
+        <p>Ориентировочное время (всего 4 академических часа = 180 минут):</p><table>
+<thead><tr><th>Шаг</th><th>Минут</th></tr></thead>
+<tbody>
+<tr><td>0А. Установка PHP (необязательный, только если PHP не установлен)</td><td>20–30</td></tr>
+<tr><td>0. Подготовка и запуск</td><td>10</td></tr>
+<tr><td>1. Создание структуры проекта</td><td>20</td></tr>
+<tr><td>2. Реализация маршрутизации</td><td>30</td></tr>
+<tr><td>3. Создание контроллеров</td><td>40</td></tr>
+<tr><td>4. Проверка работы приложения (на примере)</td><td>10</td></tr>
+<tr><td>5. Перенос на свою предметную область</td><td>25</td></tr>
+<tr><td>6. Итоговый отчёт</td><td>10</td></tr>
+</tbody>
+</table>
+
+        <h3>Шаг 0А (необязательный). Установка PHP</h3>
+        <p>Выполняется только если команда <code>php -v</code> не работает или показывает версию ниже 8.2. Если PHP уже установлен, переходите к Шагу 0.</p><table>
+<thead><tr><th>Система</th><th>Как установить</th></tr></thead>
+<tbody>
+<tr><td><strong>macOS</strong></td><td>через менеджер пакетов Homebrew (<a href="https://brew.sh">brew.sh</a>): в терминале <code>brew install php@8.2</code>. После установки выполните команду, которую brew выведет в конце про добавление PHP в PATH (при необходимости закройте и снова откройте терминал)</td></tr>
+<tr><td><strong>Windows</strong></td><td>скачайте архив PHP 8.2 или новее с сайта <a href="https://windows.php.net/download">windows.php.net/download</a> (вариант <em>Non Thread Safe</em>, архив .zip), распакуйте его в папку <code>C:\php</code>, добавьте эту папку в системную переменную <code>PATH</code> («Параметры системы → Переменные среды → Path → Создать»), закройте и снова откройте терминал. Запасной вариант: установить пакет XAMPP (<a href="https://www.apachefriends.org">apachefriends.org</a>), в нём PHP лежит в <code>C:\xampp\php</code>: эту папку нужно добавить в PATH</td></tr>
+<tr><td><strong>Linux (Ubuntu, Debian)</strong></td><td>в терминале <code>sudo apt update</code>, затем <code>sudo apt install php-cli</code>. Проверьте версию: если она ниже 8.2, обратитесь к преподавателю</td></tr>
+<tr><td><strong>Если ничего не получилось</strong></td><td>работайте в паре с тем, у кого PHP установлен, а установку завершите дома. Для тех, у кого уже есть Docker, запасной вариант запуска без установки PHP: в папке <code>lab6/src</code> выполнить <code>docker run --rm -p 8000:8000 -v "$(pwd)":/app -w /app php:8.2-cli php -S 0.0.0.0:8000 -t public</code></td></tr>
+</tbody>
+</table><ol><li>Закройте терминал и откройте новый (чтобы изменения PATH вступили в силу).</li><li>Выполните <code>php -v</code>: должна появиться строка <code>PHP 8.2.xx</code> (или новее).</li><li>Выполните <code>php -m</code> и убедитесь, что в списке есть <code>json</code> и <code>mbstring</code>: они понадобятся приложению. В стандартных сборках они включены.</li></ol><p><strong>Если возникла ошибка</strong>, не тратьте на неё больше 15 минут: запишите текст ошибки и позовите преподавателя. Остальные шаги можно начать, работая в паре.</p>
+
+        <h3>Шаг 0. Подготовка и запуск</h3><ol><li>Скопируйте заготовку в каталог <code>lab6/src/</code> своего репозитория и откройте папку в VS Code.</li><li>Откройте терминал в папке <code>lab6/src</code> и запустите сервер: <code>php -S localhost:8000 -t public</code>.</li><li>Откройте в браузере <code>http://localhost:8000</code>. Вы должны увидеть текст «Сервер работает. Допишите файл по заданиям TODO 1.1 и 1.2.»</li><li>Найдите в проекте все пометки <code>TODO</code> и просмотрите готовые файлы: <code>app/helpers.php</code>, <code>app/Models/TaskRepository.php</code>, <code>app/Views/tasks/index.php</code>. Они будут образцами.</li></ol>
+
+        <h3>Шаг 1. Создание структуры проекта</h3>
+        <p>Создайте структуру серверной части приложения. Структура в заготовке уже построена по рекомендуемой схеме, а точку входа вам нужно написать самим.</p><ol><li>Убедитесь, что в проекте есть все каталоги из рекомендованной схемы: <code>public/</code>, <code>app/Controllers/</code>, <code>app/Models/</code>, <code>app/Views/</code>, <code>routes/</code>, <code>config/</code>. Выясните по описанию в теории, для чего нужен каждый.</li><li><strong>TODO 1.1.</strong> В <code>public/index.php</code> определите константы с путями к каталогам проекта и подключите готовые файлы автозагрузки и вспомогательных функций.</li><li><strong>TODO 1.2.</strong> Там же создайте маршрутизатор, подключите таблицу маршрутов и передайте ему запрос. Удалите строку-заглушку с <code>echo</code>.</li></ol><p><strong>Проверка:</strong> после перезагрузки страницы вы должны увидеть пустую страницу без ошибок. Если вместо неё сообщение об ошибке, прочитайте его: в нём указан файл и строка.</p>
+
+        <h3>Шаг 2. Реализация маршрутизации</h3>
+        <p>Создайте механизм обработки HTTP-запросов. Необходимо обеспечить: регистрацию маршрутов, обработку различных URL, передачу управления соответствующему контроллеру и обработку ошибок при обращении к несуществующим маршрутам. Сложная часть маршрутизатора (поиск подходящего маршрута и вызов контроллера: метод <code>dispatch()</code>) уже написана и подробно прокомментирована: ваша задача разобраться в ней и дописать недостающее.</p><ol><li><strong>Прочитайте метод <code>dispatch()</code> в <code>app/Core/Router.php</code>.</strong> По комментариям выпишите в черновик (потом пригодится для отчёта), что происходит на каждой строке цикла: какие маршруты пропускаются, как проверяется адрес, как вызывается контроллер.</li><li><strong>TODO 2.1.</strong> Допишите метод <code>add()</code>, который запоминает маршрут в списке (регистрация маршрутов).</li><li><strong>TODO 2.2.</strong> В конце <code>dispatch()</code> добавьте обработку несуществующих маршрутов: страница 404 с кодом ответа 404.</li><li><strong>TODO 2.3.</strong> В <code>routes/web.php</code> зарегистрируйте семь маршрутов из таблицы (обработка различных URL). Следите за порядком: <code>/tasks/create</code> должен быть выше <code>/tasks/{id}</code>.</li></ol>
+        <p><strong>Проверка в этом шаге.</strong> Контроллеры пока пустые, поэтому для проверки маршрутов временно добавьте в начало каждого метода контроллера строку, например:</p><div class="code-block">echo &#x27;TaskController::show, id = &#x27; . $id;</div><p>Откройте <code>/tasks/5</code>: должна появиться эта строка с <code>id = 5</code>. Откройте <code>/nonexistent</code>: должна появиться страница «404 — страница не найдена». Когда убедитесь, что маршруты работают, строки <code>echo</code> удалите, иначе они испортят страницы.</p>
+
+        <h3>Шаг 3. Создание контроллеров</h3>
+        <p>Разработайте контроллеры для основных пользовательских сценариев: главная страница, список объектов, просмотр объекта, создание объекта. Каждый контроллер содержит методы обработки соответствующих запросов. Должно получиться не менее трёх контроллеров.</p>
+        <p>Все шаблоны страниц и методы создания объекта (<code>TaskController::create()</code> и <code>store()</code>) уже готовы как образцы: изучите их и используйте как подсказку. Вам остаётся написать методы, которые собирают данные и передают их в шаблон.</p><ol><li><strong>TODO 3.1.</strong> <code>HomeController::index()</code>: соберите данные для главной (число задач по статусам, число проектов) и передайте их в шаблон <code>home.php</code>.</li><li><strong>TODO 3.2.</strong> <code>TaskController::index()</code>: список задач с необязательным фильтром <code>?status=...</code>. Шаблон <code>tasks/index.php</code> изучите заранее.</li><li><strong>TODO 3.3.</strong> <code>TaskController::show($id)</code>: одна задача; если её нет — <code>notFound()</code>.</li><li><strong>TODO 3.4 и 3.5.</strong> <code>ProjectController</code> (методы <code>index</code> и <code>show</code>) напишите <strong>самостоятельно</strong> по образцу <code>TaskController</code>: так вы убедитесь, что поняли, как устроен контроллер.</li><li><strong>Разберите готовый код формы</strong> (<code>TaskController::create()</code> и <code>store()</code>): по комментариям объясните, что делает каждый шаг. Откройте <code>/tasks/create</code>, создайте задачу, найдите её в <code>storage/tasks.json</code>.</li></ol><p><strong>Проверка:</strong> после каждого контроллера открывайте его адрес в браузере и сверяйтесь с результатом. Ошибки PHP выводятся на странице и в терминале.</p>
+
+        <h3>Шаг 4. Проверка работы приложения</h3>
+        <p>Проверьте корректность работы маршрутизации. Убедитесь, что маршруты обрабатываются корректно, вызываются соответствующие контроллеры, и пользователю отображаются необходимые страницы или данные. Занесите результаты в отчёт: для каждой строки укажите код ответа (вкладка Network или <code>curl -i</code>). Проверка выполняется на данных примера («задачи» и «проекты»): после Шага 5 вы повторите её на данных своей предметной области.</p><table>
+<thead><tr><th>Запрос</th><th>Контроллер и метод</th><th>Ожидаемый результат</th></tr></thead>
+<tbody>
+<tr><td><code>GET /</code></td><td><code>HomeController::index</code></td><td>200, четыре карточки с числами и ссылки</td></tr>
+<tr><td><code>GET /tasks</code></td><td><code>TaskController::index</code></td><td>200, таблица со всеми задачами</td></tr>
+<tr><td><code>GET /tasks?status=done</code></td><td><code>TaskController::index</code></td><td>200, только выполненные задачи</td></tr>
+<tr><td><code>GET /tasks/3</code></td><td><code>TaskController::show</code></td><td>200, страница задачи №3 с названием её проекта</td></tr>
+<tr><td><code>GET /tasks/999</code></td><td><code>TaskController::show</code></td><td>404, страница «не найдена»</td></tr>
+<tr><td><code>GET /tasks/create</code></td><td><code>TaskController::create</code></td><td>200, форма (а не просмотр задачи с id «create»)</td></tr>
+<tr><td>отправка формы с пустым названием</td><td><code>TaskController::store</code></td><td>422, форма с красными подсказками, введённые значения сохранены</td></tr>
+<tr><td>отправка корректной формы</td><td><code>TaskController::store</code></td><td>302, затем 200 на <code>/tasks</code>; новая задача в списке и в <code>storage/tasks.json</code></td></tr>
+<tr><td><code>GET /projects</code></td><td><code>ProjectController::index</code></td><td>200, карточки проектов</td></tr>
+<tr><td><code>GET /projects/2</code></td><td><code>ProjectController::show</code></td><td>200, проект и список его задач</td></tr>
+<tr><td><code>GET /nonexistent</code></td><td>маршрут не найден</td><td>404, страница «не найдена»</td></tr>
+<tr><td><code>POST /projects</code></td><td>нет такого маршрута</td><td>404 (для адреса есть только <code>GET</code>)</td></tr>
+</tbody>
+</table><p>Удобно проверять и без браузера: <code>curl -i http://localhost:8000/tasks/999</code> (первая строка ответа покажет код).</p>
+
+        <h3>Шаг 5. Перенос на свою предметную область</h3>
+        <p>Сейчас у вас работающее приложение на примере «Система управления задачами»: задачи и проекты. Перенесите его на предметную область вашего проекта из лабораторной работы №1: те же страницы и контроллеры, но с вашими сущностями (например, заказы и клиенты, книги и авторы, обращения и сотрудники).</p>
+        <p><strong>Перед началом:</strong> убедитесь, что Шаг 4 пройден и всё работает, и сделайте коммит в Git. Тогда перенос можно безопасно откатить: <code>git checkout .</code> вернёт файлы к последнему коммиту.</p><p><strong>1. Заполните карточку предметной области</strong> (ниже пример для интернет-магазина; в отчёт попадёт ваша заполненная карточка):</p><table>
+<thead><tr><th>Что определить</th><th>Пример (в заготовке)</th><th>Пример для магазина</th><th>Ваш вариант</th></tr></thead>
+<tbody>
+<tr><td>Основная сущность (рус.)</td><td>задача</td><td>заказ</td><td></td></tr>
+<tr><td>Основная сущность (англ., ед. / мн. число)</td><td><code>task</code> / <code>tasks</code></td><td><code>order</code> / <code>orders</code></td><td></td></tr>
+<tr><td>Связанная сущность (рус.)</td><td>проект</td><td>клиент</td><td></td></tr>
+<tr><td>Связанная сущность (англ., ед. / мн. число)</td><td><code>project</code> / <code>projects</code></td><td><code>customer</code> / <code>customers</code></td><td></td></tr>
+<tr><td>Поля основной сущности (4–6)</td><td><code>id, project_id, title, status, priority, due_date</code></td><td><code>id, customer_id, title, status, amount, created_at</code></td><td></td></tr>
+<tr><td>Поле для фильтра и его значения (2–4)</td><td><code>status</code>: <code>new</code>, <code>in_progress</code>, <code>done</code></td><td><code>status</code>: <code>new</code>, <code>paid</code>, <code>shipped</code></td><td></td></tr>
+<tr><td>Поля связанной сущности (2–3)</td><td><code>id, title, description</code></td><td><code>id, name, phone</code></td><td></td></tr>
+</tbody>
+</table>
+        <p>Правила: у каждой сущности есть числовое поле <code>id</code>; основная сущность хранит номер связанной в поле вида <code>customer_id</code> (<code>название_связанной_сущности_id</code>); одно поле основной сущности принимает ограниченный набор значений (по нему работает фильтр); остальные поля любые. Названия в коде пишите <strong>латиницей</strong>, подписи для пользователя на странице <strong>по-русски</strong>.</p><p><strong>2. Что и где нужно изменить</strong> (карта переноса; в примере «задача → заказ», «проект → клиент»):</p><table>
+<thead><tr><th>Что менять</th><th>Где</th><th>Как</th></tr></thead>
+<tbody>
+<tr><td>контроллеры</td><td><code>app/Controllers/TaskController.php</code>, <code>ProjectController.php</code></td><td>переименуйте файлы и классы: <code>OrderController</code>, <code>CustomerController</code>; внутри замените названия моделей и шаблонов</td></tr>
+<tr><td>модели</td><td><code>app/Models/TaskRepository.php</code>, <code>ProjectRepository.php</code></td><td>переименуйте файлы и классы; в начале класса измените имя файла с данными; метод <code>byProject()</code> переименуйте по связанной сущности (<code>byCustomer()</code>) вместе с его вызовом в контроллере</td></tr>
+<tr><td>данные</td><td><code>storage/tasks.json</code>, <code>projects.json</code></td><td>переименуйте файлы и замените записи своими (5–7 основных, 2–3 связанных); поле <code>project_id</code> → <code>customer_id</code></td></tr>
+<tr><td>шаблоны</td><td>папки <code>app/Views/tasks/</code> и <code>projects/</code></td><td>переименуйте папки (<code>orders/</code>, <code>customers/</code>); внутри измените столбцы таблиц, подписи полей, имена переменных и ссылки</td></tr>
+<tr><td>маршруты</td><td><code>routes/web.php</code></td><td>замените адреса (<code>/tasks</code> → <code>/orders</code>) и имена классов; порядок строк не меняйте</td></tr>
+<tr><td>поля формы и проверка</td><td><code>TaskController::store()</code> и <code>Views/tasks/create.php</code></td><td>какие поля читаются из <code>$_POST</code>, как проверяются и как выглядят в форме</td></tr>
+<tr><td>списки значений и подписи</td><td><code>$statusNames</code>, <code>$priorityNames</code> в шаблонах</td><td>значения и русские подписи вашего поля для фильтра</td></tr>
+<tr><td>главная и меню</td><td><code>HomeController.php</code>, <code>Views/home.php</code>, <code>Views/layout/header.php</code></td><td>подсчёт по значениям вашего поля, подписи карточек, ссылки меню</td></tr>
+<tr><td>название системы</td><td><code>config/app.php</code></td><td>измените <code>name</code></td></tr>
+</tbody>
+</table>
+        <div class="highlight">
+            <p><strong>Как выполнить перенос без лишних ошибок:</strong></p>
+            <ul>
+                <li>переносите только <strong>после</strong> Шага 4 и коммита в Git (чтобы можно было откатить изменения командой <code>git checkout .</code>);</li>
+                <li>маршрутизатор (<code>app/Core/Router.php</code>), автозагрузку и структуру каталогов менять не нужно: перенос их не касается;</li>
+                <li>меняйте по одному пункту из таблицы и после каждого открывайте страницу: так ошибка всегда будет в последнем изменённом файле;</li>
+                <li>после переноса просмотрите <code>git diff</code>: вы должны понимать, что изменилось в каждом файле.</li>
+            </ul>
+        </div>
+        <p><strong>3. Проверьте результат.</strong></p><ol><li>Повторите таблицу из Шага 4 на своих адресах: все строки должны дать те же коды ответа (200, 404, 422, 302).</li><li>Откройте старые адреса примера (<code>/tasks</code>, <code>/projects</code>): теперь они должны возвращать 404. Если открываются, перенос не завершён.</li><li>Найдите в проекте остатки примера: поиск по всему проекту в VS Code (Ctrl+Shift+F) по словам <code>task</code>, <code>project</code> (регистр не важен) и по русским подписям примера («Задачи», «задач», «Проекты»). Допустимы только упоминания в комментариях-примерах.</li><li>Создайте через форму новую запись и убедитесь, что она появилась в списке и в вашем файле данных в <code>storage/</code>.</li></ol><p><strong>4. В отчёт</strong> (раздел «Предметная область» в <code>README.md</code>): заполненная карточка предметной области и 2–3 предложения: что вы изменили и как проверили результат.</p>
+
+        <h3>Шаг 6. Подготовка итогового отчёта</h3>
+        <p>Оформите результаты работы в виде Git-репозитория с использованием Markdown (см. раздел «Требования к оформлению»). Сделайте скриншоты страниц <strong>на данных вашей предметной области</strong> (главная, список, просмотр, форма с ошибками, страница 404) и вкладки Network с кодами ответов и добавьте их в <code>lab6/images/</code>. Не забудьте раздел «Предметная область» (Шаг 5).</p>
+
+        <h2>Что должно получиться в результате</h2><p>В результате выполнения лабораторной работы должны быть подготовлены:</p><ul><li>структура PHP-проекта;</li><li>реализованный механизм маршрутизации;</li><li>не менее трёх контроллеров;</li><li>корректная обработка основных HTTP-запросов;</li><li>демонстрация работы серверной части приложения;</li><li>работающее приложение на данных вашей предметной области (Шаг 5).</li></ul>
+
+        <h3>Критерии проверки</h3><table>
+<thead><tr><th>№</th><th>Что проверяется</th><th>Балл</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Создана структура серверной части приложения: каталоги по схеме, единая точка входа <code>public/index.php</code></td><td>1</td></tr>
+<tr><td>2</td><td>Реализован механизм маршрутизации HTTP-запросов: регистрация маршрутов, параметры в адресе, передача управления контроллеру, страница 404 для несуществующих адресов</td><td>1</td></tr>
+<tr><td>3</td><td>Разработаны контроллеры для обработки запросов: не менее трёх, методы для главной, списка, просмотра и создания</td><td>1</td></tr>
+<tr><td>4</td><td>Репозиторий оформлен в соответствии с требованиями, документация содержит описание выполненной реализации</td><td>1</td></tr>
+</tbody>
+</table>
+
+        <p>Критерии проверяются на данных вашей предметной области. При защите нужно уметь объяснить любой файл проекта и все изменения, сделанные при переносе.</p>
+
+        <h3>Повышенная сложность (по желанию)</h3><ul><li>напишите метод <code>dispatch()</code> маршрутизатора <strong>самостоятельно</strong>, не подглядывая в готовый, и сравните с исходным;</li><li>напишите <strong>самостоятельно</strong> методы <code>create()</code> и <code>store()</code> и шаблоны страниц (закройте готовые файлы и сравните результат с образцом);</li><li>ответ <code>405 Method Not Allowed</code>: если для адреса есть маршрут, но с другим методом (например, <code>GET /tasks</code> есть, а <code>PUT /tasks</code> запросили), отвечать 405, а не 404;</li><li>сообщение об успехе после создания задачи («Задача создана»), которое показывается один раз после перенаправления (подсказка: сессии, <code>session_start()</code> и <code>$_SESSION</code>);</li><li>удаление задачи: форма с кнопкой «Удалить», маршрут <code>POST /tasks/{id}/delete</code>, метод модели <code>delete()</code>;</li><li>постраничный вывод списка (<code>/tasks?page=2</code>);</li><li>вынесение общего кода трёх контроллеров в базовый класс <code>Controller</code>;</li><li>именованные маршруты и функция <code>route('tasks.show', ['id' => 5])</code> для построения адресов.</li></ul>
+
+        <h2>Типичные ошибки</h2><table>
+<thead><tr><th>Что происходит</th><th>Вероятная причина</th></tr></thead>
+<tbody>
+<tr><td>Пустая белая страница</td><td>ошибка, которую PHP не показал на странице: смотрите терминал, где запущен сервер; либо в <code>index.php</code> остался <code>echo</code>-заглушка или не вызван <code>dispatch()</code></td></tr>
+<tr><td><code>Call to undefined function view()</code></td><td>в <code>index.php</code> не подключён файл <code>app/helpers.php</code> (TODO 1.1)</td></tr>
+<tr><td><code>Undefined constant "APP_PATH"</code> или <code>BASE_PATH</code></td><td>константы не определены до подключения файлов (TODO 1.1)</td></tr>
+<tr><td><code>Class "App\Controllers\TaskController" not found</code></td><td>опечатка в имени класса или файла, неверный <code>namespace</code> в начале файла или файл лежит не в той папке (регистр букв важен)</td></tr>
+<tr><td><code>Unknown named parameter $id</code></td><td>имя параметра метода контроллера не совпадает с именем в маршруте: для <code>/tasks/{id}</code> нужен <code>show(string $id)</code></td></tr>
+<tr><td><code>Undefined variable $tasks</code> в шаблоне</td><td>контроллер не передал переменную в <code>view()</code> или передал под другим именем</td></tr>
+<tr><td><code>/tasks/create</code> показывает «задача не найдена»</td><td>маршрут <code>/tasks/{id}</code> стоит выше <code>/tasks/create</code>: поменяйте порядок</td></tr>
+<tr><td>Форма отправляется, и открывается страница 404</td><td>не зарегистрирован маршрут <code>post('/tasks', ...)</code> (метод <code>POST</code> и <code>GET</code> — разные маршруты)</td></tr>
+<tr><td><code>Cannot modify header information - headers already sent</code></td><td>перед <code>redirect()</code> или <code>http_response_code()</code> уже что-то выведено: оставленный <code>echo</code>, пробел или пустая строка до <code>&lt;?php</code></td></tr>
+<tr><td>После переноса <code>Class "App\Controllers\OrderController" not found</code></td><td>переименован файл, но не класс внутри него (или наоборот): имя файла, имя класса и имя в <code>routes/web.php</code> должны совпадать</td></tr>
+<tr><td>После переноса <code>Undefined array key "customer_id"</code></td><td>поле связи переименовано не везде: проверьте файл данных в <code>storage/</code>, метод <code>store()</code> и шаблоны</td></tr>
+<tr><td>После переноса на странице остались слова «задачи», «проекты»</td><td>не изменены подписи в шаблонах и в меню: ищите по проекту русские слова из примера</td></tr>
+<tr><td>Вместо русских букв «???» или «Ð...»</td><td>файл сохранён не в кодировке UTF-8</td></tr>
+<tr><td>Изменения «не видны»</td><td>файл не сохранён; перезапускать сервер не нужно, достаточно обновить страницу (Ctrl+F5)</td></tr>
+</tbody>
+</table>
+
+        <h2>Контрольные вопросы</h2><ol><li>Что такое единая точка входа (front controller) и зачем она нужна?</li><li>Что означает ключ <code>-t public</code> при запуске встроенного сервера? Почему наружу открыта только эта папка?</li><li>Что такое маршрут? Из каких частей он состоит?</li><li>Что означает запись <code>/tasks/{id}</code> и как значение из адреса попадает в контроллер?</li><li>Почему порядок регистрации маршрутов важен? Приведите пример.</li><li>Какие роли у модели, представления и контроллера в MVC? Что произойдёт, если смешать их в одном файле?</li><li>Зачем нужна функция <code>e()</code> и что такое XSS-атака?</li><li>Чем отличаются <code>$_GET</code> и <code>$_POST</code>? Где вы их использовали?</li><li>Объясните своими словами, что делает цикл в методе <code>dispatch()</code>: как выбирается маршрут и как вызывается контроллер.</li><li>Что означают коды ответа 200, 302, 404, 422, 500? Когда ваше приложение возвращает каждый из них?</li><li>Какие файлы вам пришлось изменить при переносе на свою предметную область и почему именно их? Какие файлы менять не потребовалось?</li><li>Зачем после успешной обработки формы выполняется перенаправление, а не показ страницы сразу? Почему переменные PHP не сохраняются между запросами и как это решено в вашем проекте?</li></ol>
+
+        <h2>Домашняя доработка</h2><ul><li>Выполнить задания повышенной сложности.</li><li>Добавить описание API: таблица «метод — адрес — что делает — формат ответа — коды ошибок» для ресурсов вашей системы (она станет основой следующей лабораторной работы по проектированию REST API).</li><li>Подготовить проект к следующей лабораторной работе.</li></ul>
+
+        <h2>Требования к оформлению</h2>
+        <p>Результаты лабораторной работы должны быть оформлены в виде Git-репозитория. Рекомендуется делать отдельный коммит после каждого шага с понятным сообщением (например, «lab6: маршрутизатор»).</p>
+        <p>Рекомендуемая структура:</p><div class="code-block">lab6/
+├── README.md
+├── src/
+├── images/
+└── docs/</div>
+        <p>Файл <code>README.md</code> должен содержать:</p><ul><li>название лабораторной работы;</li><li>цель работы;</li><li>описание структуры проекта;</li><li>описание механизма маршрутизации;</li><li>описание реализованных контроллеров;</li><li>вывод.</li></ul>
+        <p>При необходимости в репозиторий добавляются:</p><ul><li>исходный код (<code>src/</code>);</li><li>изображения структуры проекта или схем (<code>images/</code>);</li><li>дополнительные материалы (<code>docs/</code>), например, результаты проверки из Шага 4.</li></ul>
+        <p>При оформлении рекомендуется:</p><ul><li>использовать язык разметки Markdown;</li><li>применять заголовки, списки и таблицы;</li><li>сопровождать основные этапы реализации пояснениями;</li><li>придерживаться понятной структуры каталогов и файлов.</li></ul>
+
+        <div class="footer">
+            <p>Лабораторная работа №6 — Разработка серверной части приложения</p>
+            <p>Курс: Архитектура современных информационных систем</p>
+        </div>
+    </div>
+</body>
+</html>
