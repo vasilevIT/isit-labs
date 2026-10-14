@@ -1,0 +1,9 @@
+[
+    { "id": 1, "project_id": 1, "title": "Сверстать главную страницу", "status": "done", "priority": "high", "due_date": "2026-10-01" },
+    { "id": 2, "project_id": 1, "title": "Подключить форму обратной связи", "status": "in_progress", "priority": "medium", "due_date": "2026-10-10" },
+    { "id": 3, "project_id": 1, "title": "Написать тексты для раздела «О нас»", "status": "new", "priority": "low", "due_date": "2026-10-15" },
+    { "id": 4, "project_id": 2, "title": "Спроектировать экран авторизации", "status": "done", "priority": "high", "due_date": "2026-09-28" },
+    { "id": 5, "project_id": 2, "title": "Реализовать список заказов", "status": "in_progress", "priority": "high", "due_date": "2026-10-12" },
+    { "id": 6, "project_id": 2, "title": "Настроить уведомления", "status": "new", "priority": "medium", "due_date": "2026-10-25" },
+    { "id": 7, "project_id": 3, "title": "Собрать требования у отдела кадров", "status": "new", "priority": "medium", "due_date": "2026-10-08" }
+]

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №7 - Проектирование REST API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .meta-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .meta-info p {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        em {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лабораторная работа №7</h1>
+        <h2 style="margin-top: 0; color: #3498db; border: none;">Проектирование REST API</h2>
+
+        <div class="meta-info">
+            <p><strong>Модуль:</strong> Разработка web приложений</p>
+            <p><strong>Тема:</strong> Современная разработка веб-приложений</p>
+            <p><strong>Продолжительность:</strong> 4 академических часа</p>
+        </div>
+
+        <h2>Цель лабораторной работы</h2>
+        <p>Изучить принципы проектирования REST API, разработать набор ресурсов информационной системы, реализовать основные HTTP-методы, подготовить документацию API и выполнить тестирование запросов.</p>
+        <p>В лабораторной работе №6 сервер отвечал HTML-страницами для браузера. Теперь вы научите его отвечать <strong>данными в формате JSON</strong>: именно так клиентское приложение (лабораторная работа №5) будет получать и менять данные на сервере.</p>
+
+        <h2>Необходимое программное обеспечение</h2><ul><li>Git;</li><li>PHP 8.2 или выше (он уже установлен после лабораторной работы №6);</li><li>Visual Studio Code (или другой редактор кода);</li><li>Postman, Insomnia или аналогичный инструмент для тестирования API (рекомендуется Postman);</li><li>веб-сервер: используется встроенный сервер PHP, ничего устанавливать не нужно.</li></ul><p><strong>Проверка установки:</strong> <code>php -v</code> показывает версию 8.2 или выше; Postman открывается и позволяет создать новый запрос (кнопка <strong>New → HTTP</strong>). Если Postman установить не удаётся, все запросы можно отправлять командой <code>curl</code> (примеры в теории, раздел 8).</p>
+
+        <h2>Постановка задачи</h2>
+        <p>На основе серверной части из лабораторной работы №6 необходимо реализовать REST API для взаимодействия клиентского приложения с сервером.</p>
+        <p>В ходе работы требуется:</p><ul><li>определить основные ресурсы информационной системы;</li><li>реализовать REST API;</li><li>подготовить документацию API;</li><li>выполнить тестирование запросов.</li></ul>
+        <p>API должно обеспечивать выполнение основных операций CRUD (Create, Read, Update, Delete) не менее чем для трёх ресурсов.</p>
+        <div class="highlight">
+            <p><strong>Что будет и чего не будет в этой работе.</strong> Вы работаете на готовой заготовке: в ней уже есть сайт из лабораторной работы №6, маршрутизатор с поддержкой всех HTTP-методов, модели с операциями «найти, добавить, изменить, удалить», вспомогательные функции для JSON-ответов и один полностью готовый ресурс (участники команды) как образец. Вам нужно написать контроллеры ещё двух ресурсов (задачи и проекты), зарегистрировать их маршруты, перенести API на свою предметную область, описать и проверить его. Авторизации, базы данных и работы с клиентским приложением в этой работе нет.</p>
+        </div>
+
+        <h2>Теоретическая база</h2>
+
+        <h3>1. Что такое API и REST</h3>
+        <div class="section">
+            <p><strong>API</strong> (Application Programming Interface) — это «меню» сервера: список запросов, которые программа-клиент может отправить, и ответов, которые получит. Сайт из лабораторной работы №6 тоже отвечает на запросы, но возвращает готовые HTML-страницы, а клиентскому приложению нужны чистые данные.</p>
+            <p><strong>REST</strong> — набор соглашений о том, как строить такое «меню» поверх протокола HTTP. Главные идеи:</p><ul><li><strong>всё — ресурсы.</strong> Ресурс — это сущность системы (задачи, проекты, участники). У каждого ресурса есть адрес (URL);</li><li><strong>действие задаётся HTTP-методом,</strong> а не словом в адресе: не <code>/getTask</code>, а <code>GET /api/tasks/5</code>;</li><li><strong>сервер не помнит клиента между запросами:</strong> каждый запрос содержит всё необходимое;</li><li><strong>данные передаются в JSON,</strong> а результат сообщается кодом ответа (200, 404, 422 и т. д.).</li></ul></div>
+
+        <h3>2. Ресурсы и адреса</h3>
+        <div class="section">
+            <p>Правила, по которым составляются адреса:</p><ul><li>адрес — это <strong>существительное во множественном числе</strong>: <code>/api/tasks</code>, <code>/api/projects</code>. Глаголов в адресе нет;</li><li>номер записи добавляется через слэш: <code>/api/tasks/5</code> — задача с номером 5;</li><li>связь «проект → его задачи» выражается вложенным адресом: <code>/api/projects/2/tasks</code>;</li><li>необязательные условия (фильтр, поиск) передаются после «?»: <code>/api/tasks?status=done&amp;project_id=1</code>;</li><li>все адреса API начинаются с <code>/api</code>, чтобы их можно было отличить от страниц сайта.</li></ul></div>
+
+        <h3>3. HTTP-методы и операции CRUD</h3>
+        <div class="section"><table>
+<thead><tr><th>Операция</th><th>Метод</th><th>Адрес</th><th>Что делает</th><th>Успешный код</th></tr></thead>
+<tbody>
+<tr><td>Read (список)</td><td><code>GET</code></td><td><code>/api/tasks</code></td><td>возвращает все задачи</td><td>200</td></tr>
+<tr><td>Read (одна)</td><td><code>GET</code></td><td><code>/api/tasks/5</code></td><td>возвращает задачу №5</td><td>200</td></tr>
+<tr><td>Create</td><td><code>POST</code></td><td><code>/api/tasks</code></td><td>создаёт задачу из данных в теле запроса</td><td>201</td></tr>
+<tr><td>Update</td><td><code>PUT</code> / <code>PATCH</code></td><td><code>/api/tasks/5</code></td><td>изменяет задачу №5</td><td>200</td></tr>
+<tr><td>Delete</td><td><code>DELETE</code></td><td><code>/api/tasks/5</code></td><td>удаляет задачу №5</td><td>204</td></tr>
+</tbody>
+</table>
+            <p><code>PUT</code> по правилам REST заменяет запись целиком, а <code>PATCH</code> меняет только присланные поля. В учебной работе оба метода обрабатывает <strong>один</strong> метод контроллера <code>update</code>: присланные поля заменяют старые, остальные остаются прежними. Браузер из адресной строки умеет отправлять только <code>GET</code>, поэтому для остальных методов нужен Postman или <code>curl</code>.</p>
+        </div>
+
+        <h3>4. Коды ответа</h3>
+        <div class="section">
+            <p>Клиент узнаёт результат запроса прежде всего по коду. В этой работе используются:</p><table>
+<thead><tr><th>Код</th><th>Название</th><th>Когда возвращать</th></tr></thead>
+<tbody>
+<tr><td>200</td><td>OK</td><td>запрос выполнен, в ответе данные (чтение, изменение)</td></tr>
+<tr><td>201</td><td>Created</td><td>запись создана; в заголовке <code>Location</code> адрес новой записи</td></tr>
+<tr><td>204</td><td>No Content</td><td>запись удалена; тела у ответа нет</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>тело запроса не является корректным JSON</td></tr>
+<tr><td>404</td><td>Not Found</td><td>нет такой записи или такого адреса</td></tr>
+<tr><td>405</td><td>Method Not Allowed</td><td>адрес существует, но не для этого метода (например, <code>DELETE /api/users</code>); в заголовке <code>Allow</code> разрешённые методы</td></tr>
+<tr><td>409</td><td>Conflict</td><td>запрос понятен, но противоречит состоянию данных (удаление проекта, в котором есть задачи)</td></tr>
+<tr><td>422</td><td>Unprocessable Entity</td><td>JSON корректный, но данные не прошли проверку (короткое название, неверный статус)</td></tr>
+<tr><td>500</td><td>Internal Server Error</td><td>ошибка в коде сервера</td></tr>
+</tbody>
+</table><p>Различие 400 и 422: <code>{"title": </code> — это не JSON вообще (400); <code>{"title": "Да"}</code> — JSON верный, но название слишком короткое (422).</p></div>
+
+        <h3>5. Формат JSON</h3>
+        <div class="section">
+            <p>JSON — текстовый формат данных. Объект записывается в фигурных скобках, список — в квадратных, строки — только в <strong>двойных</strong> кавычках, после последнего элемента запятой нет:</p><div class="code-block">{
+    &quot;id&quot;: 8,
+    &quot;project_id&quot;: 1,
+    &quot;title&quot;: &quot;Проверить API&quot;,
+    &quot;status&quot;: &quot;new&quot;,
+    &quot;priority&quot;: &quot;high&quot;,
+    &quot;due_date&quot;: null
+}</div>
+            <p>В PHP два действия: <code>json_decode($text, true)</code> превращает JSON в массив, <code>json_encode($array)</code> превращает массив в JSON. В заготовке это уже сделано внутри функций <code>json_input()</code> и <code>json_response()</code>.</p>
+            <p><strong>Единый формат ошибок</strong> облегчает жизнь клиенту: всегда один и тот же вид.</p><div class="code-block">{
+    &quot;error&quot;: &quot;Ошибка проверки данных&quot;,
+    &quot;errors&quot;: {
+        &quot;title&quot;: &quot;Название — не короче 3 символов&quot;,
+        &quot;status&quot;: &quot;Статус: new, in_progress или done&quot;
+    }
+}</div></div>
+
+        <h3>6. Что уже есть в заготовке</h3>
+        <div class="section"><table>
+<thead><tr><th>Что</th><th>Где</th><th>Что делает</th></tr></thead>
+<tbody>
+<tr><td><code>json_response($данные, $код)</code></td><td><code>app/helpers.php</code></td><td>отправляет данные как JSON с нужным кодом (по умолчанию 200) и завершает работу</td></tr>
+<tr><td><code>json_error($сообщение, $код, $ошибки)</code></td><td><code>app/helpers.php</code></td><td>отправляет ошибку в едином формате</td></tr>
+<tr><td><code>no_content()</code></td><td><code>app/helpers.php</code></td><td>отвечает кодом 204 без тела</td></tr>
+<tr><td><code>json_input()</code></td><td><code>app/helpers.php</code></td><td>читает JSON из тела запроса и возвращает массив; при некорректном JSON сама отвечает 400</td></tr>
+<tr><td><code>$router->put / patch / delete</code></td><td><code>app/Core/Router.php</code></td><td>регистрация маршрутов для остальных методов. Роутер сам отвечает 405 и 404 в формате JSON для адресов, начинающихся с <code>/api</code></td></tr>
+<tr><td>модели: <code>all, find, add, update, delete</code></td><td><code>app/Models/JsonRepository.php</code></td><td>все операции с данными; <code>TaskRepository</code>, <code>ProjectRepository</code>, <code>UserRepository</code> наследуют их</td></tr>
+<tr><td><code>UserApiController</code></td><td><code>app/Controllers/Api/</code></td><td>полностью готовый ресурс: образец для ваших контроллеров</td></tr>
+</tbody>
+</table>
+            <p>Каждый контроллер API состоит из пяти методов с одинаковым «скелетом». Запомните его:</p><div class="code-block">index()          список            -&gt;  json_response($модель-&gt;all());
+show($id)        одна запись       -&gt;  найти;  нет -&gt; json_error(..., 404);  есть -&gt; json_response($запись);
+store()          создание          -&gt;  json_input();  проверить -&gt; при ошибках 422;  add();  201 + Location
+update($id)      изменение         -&gt;  найти (404);  склеить старое и присланное;  проверить (422);  update()
+destroy($id)     удаление          -&gt;  delete();  нет записи -&gt; 404;  иначе no_content() (204)</div></div>
+
+        <h3>7. Проверка данных на сервере</h3>
+        <div class="section">
+            <p>Клиенту доверять нельзя: он может прислать что угодно. Поэтому перед сохранением каждое поле проверяется, а все найденные ошибки возвращаются сразу (код 422), чтобы клиент мог исправить их за один раз. В заготовке проверка уже написана в приватном методе <code>validate()</code> каждого контроллера: он возвращает массив <code>поле => сообщение</code>, пустой массив означает, что всё хорошо. Метод <code>clean()</code> оставляет только известные поля и отбрасывает лишнее (например, попытку изменить <code>id</code>).</p>
+        </div>
+
+        <h3>8. Как отправлять и проверять запросы</h3>
+        <div class="section">
+            <p><strong>Postman.</strong> Создайте запрос (<strong>New → HTTP</strong>), выберите метод, введите адрес вида <code>http://localhost:8000/api/tasks</code>. Для <code>POST</code>, <code>PUT</code> и <code>PATCH</code> откройте вкладку <strong>Body</strong>, выберите <strong>raw</strong> и тип <strong>JSON</strong>, введите тело запроса. Нажмите <strong>Send</strong>. В нижней части видны <strong>код ответа</strong> (Status), тело ответа и вкладка <strong>Headers</strong> (там <code>Location</code>, <code>Allow</code>).</p>
+            <p><strong>curl</strong> (запасной вариант, работает в терминале):</p><div class="code-block">curl -i http://localhost:8000/api/tasks/3                                   # GET: -i показывает код и заголовки
+curl -i -X POST http://localhost:8000/api/tasks -d &#x27;{&quot;title&quot;:&quot;Проверить API&quot;,&quot;project_id&quot;:1}&#x27;
+curl -i -X PATCH http://localhost:8000/api/tasks/3 -d &#x27;{&quot;status&quot;:&quot;done&quot;}&#x27;
+curl -i -X DELETE http://localhost:8000/api/tasks/3</div>
+            <div class="highlight">
+                <p><strong>Данные настоящие.</strong> Запросы <code>POST</code>, <code>PATCH</code> и <code>DELETE</code> меняют файлы в <code>storage/</code>. Если вы удалили что-то лишнее, верните исходные данные: <code>git checkout storage</code> (при условии, что вы сделали коммит до экспериментов).</p>
+            </div>
+        </div>
+
+        <h3>9. Как описывать API</h3>
+        <div class="section">
+            <p>Документация нужна тому, кто будет вызывать ваш API (например, автору клиентского приложения): он не читает ваш код. Для каждой конечной точки (endpoint) пишется одинаковый блок:</p><div class="code-block">### POST /api/tasks — создать задачу
+
+Параметры тела (JSON):
+| Поле       | Тип    | Обязательное | Описание                                   |
+|------------|--------|--------------|--------------------------------------------|
+| title      | string | да           | название, не короче 3 символов             |
+| project_id | number | да           | номер существующего проекта                |
+| status     | string | нет          | new (по умолчанию), in_progress, done      |
+
+Пример запроса:
+POST /api/tasks
+{&quot;title&quot;: &quot;Проверить API&quot;, &quot;project_id&quot;: 1}
+
+Пример ответа (201 Created):
+{&quot;id&quot;: 8, &quot;project_id&quot;: 1, &quot;title&quot;: &quot;Проверить API&quot;, &quot;status&quot;: &quot;new&quot;, ...}
+
+Ошибки: 400 (не JSON), 422 (данные не прошли проверку).</div></div>
+
+        <h3>10. Как искать ошибки</h3>
+        <div class="section">
+            <p>Общие правила из лабораторной работы №6 (точка с запятой, парные скобки, регистр букв, <code>&lt;?php</code> в первой строке) действуют и здесь. Дополнительно для API:</p><ol><li>Если в ответ вместо JSON пришла страница с текстом ошибки PHP, откройте её: там указаны файл и строка.</li><li>Ответ <strong>400</strong> почти всегда означает ошибку в вашем JSON: одинарные кавычки вместо двойных, запятая после последнего поля, лишний или пропущенный символ. В Postman выбран тип <strong>raw → JSON</strong>?</li><li>Ответ <strong>404</strong> на правильный адрес: маршрут не зарегистрирован в <code>routes/web.php</code> или в адресе опечатка (<code>/api/task</code> вместо <code>/api/tasks</code>).</li><li>Ответ <strong>405</strong>: маршрут для этого метода не зарегистрирован (забыли строку <code>$router->delete(...)</code>). Заголовок <code>Allow</code> показывает, какие методы есть.</li><li>Пустой ответ с кодом 200: метод контроллера ещё не написан (остался только комментарий с <code>TODO</code>).</li><li>Смотрите в терминал, где запущен сервер: там для каждого запроса есть строка с адресом и кодом.</li></ol></div>
+
+        <h2>Структура заготовки проекта</h2>
+
+        <div class="code-block">src/
+├── public/
+│   ├── index.php                 # единая точка входа (ГОТОВО; для /api ошибки 500 тоже в JSON)
+│   └── css/style.css
+├── app/
+│   ├── autoload.php
+│   ├── helpers.php               # + json_response(), json_error(), no_content(), json_input() (ГОТОВО)
+│   ├── Core/Router.php           # + put(), patch(), delete(), ответы 405 и 404 в JSON (ГОТОВО)
+│   ├── Controllers/
+│   │   ├── HomeController.php, TaskController.php, ProjectController.php   # сайт из лабораторной работы №6 (ГОТОВО)
+│   │   └── Api/
+│   │       ├── UserApiController.php       # образец, полностью готов
+│   │       ├── TaskApiController.php       # Часть 2: TODO 2.1 – 2.5
+│   │       └── ProjectApiController.php    # Часть 3: TODO 3.1 – 3.5
+│   ├── Models/                   # JsonRepository + три модели (ГОТОВО)
+│   └── Views/                    # шаблоны сайта (ГОТОВО)
+├── routes/web.php                # Часть 1: TODO 1.1 – 1.2 (маршруты API)
+├── config/app.php
+└── storage/                      # tasks.json, projects.json, users.json</div>
+
+        <h2>Этапы выполнения</h2>
+
+        <p>Работа выполняется на готовой заготовке. Задания в коде помечены словом <code>TODO</code>, после каждого есть строка «✔ Проверка»: выполнили задание, проверили, только потом следующее. После каждого шага делайте коммит в Git.</p>
+
+        <p>Ориентировочное время (всего 4 академических часа = 180 минут):</p><table>
+<thead><tr><th>Шаг</th><th>Минут</th></tr></thead>
+<tbody>
+<tr><td>0. Подготовка и запуск</td><td>10</td></tr>
+<tr><td>1. Проектирование ресурсов</td><td>20</td></tr>
+<tr><td>2. Реализация REST API (части 1–3 и перенос на свою предметную область)</td><td>90</td></tr>
+<tr><td>3. Документирование API</td><td>25</td></tr>
+<tr><td>4. Тестирование API</td><td>25</td></tr>
+<tr><td>5. Итоговый отчёт</td><td>10</td></tr>
+</tbody>
+</table>
+
+        <h3>Шаг 0. Подготовка и запуск</h3><ol><li>Скопируйте заготовку в каталог <code>lab7/src/</code> своего репозитория, сделайте первый коммит и откройте папку в VS Code.</li><li>Запустите сервер в папке <code>lab7/src</code>: <code>php -S localhost:8000 -t public</code>. Откройте <code>http://localhost:8000</code>: должен работать сайт из лабораторной работы №6.</li><li>Откройте в Postman (или браузере) <code>http://localhost:8000/api/users</code>: вы получите список участников в JSON. Это готовый ресурс.</li><li>Изучите <code>app/Controllers/Api/UserApiController.php</code> и маршруты участников в <code>routes/web.php</code>. Разберите, как работает каждый из пяти методов: по этому образцу вы напишете остальные.</li></ol>
+
+        <h3>Шаг 1. Проектирование ресурсов</h3>
+        <p>Определите ресурсы системы и для каждого опишите: URL, поддерживаемые HTTP-методы, назначение, формат передаваемых данных. Подготовьте таблицу для <code>README.md</code> (минимум три ресурса). Заготовка реализует ресурсы <code>tasks</code>, <code>projects</code>, <code>users</code>; заполните таблицу для них, а в Шаге 2 вы перенесёте её на свою предметную область.</p><table>
+<thead><tr><th>Ресурс</th><th>URL</th><th>Методы</th><th>Назначение</th><th>Формат данных</th></tr></thead>
+<tbody>
+<tr><td>Задачи</td><td><code>/api/tasks</code>, <code>/api/tasks/{id}</code></td><td>GET, POST, PUT/PATCH, DELETE</td><td>учёт задач команды</td><td>JSON: <code>id, project_id, title, status, priority, due_date</code></td></tr>
+<tr><td>Проекты</td><td><code>/api/projects</code>, <code>/api/projects/{id}</code>, <code>/api/projects/{id}/tasks</code></td><td>GET, POST, PUT/PATCH, DELETE</td><td>проекты и их задачи</td><td>JSON: <code>id, title, description</code></td></tr>
+<tr><td>Участники</td><td><code>/api/users</code>, <code>/api/users/{id}</code></td><td>GET, POST, PUT/PATCH, DELETE</td><td>состав команды</td><td>JSON: <code>id, name, email, role</code></td></tr>
+</tbody>
+</table>
+
+        <h3>Шаг 2. Реализация REST API</h3>
+        <p>Реализуйте обработку HTTP-запросов для каждого ресурса: список (GET), объект по идентификатору (GET), создание (POST), обновление (PUT или PATCH), удаление (DELETE). Ответы возвращайте в формате JSON. Шаг состоит из четырёх частей.</p>
+        <p><strong>Часть 1. Маршруты</strong> (<code>routes/web.php</code>, TODO 1.1 и 1.2). Зарегистрируйте по образцу участников шесть маршрутов для задач и семь для проектов (седьмой — вложенный <code>/api/projects/{id}/tasks</code>). Метод <code>PATCH</code> и <code>PUT</code> направляются в один и тот же метод контроллера.</p>
+        <p><strong>Часть 2. Задачи</strong> (<code>TaskApiController.php</code>, TODO 2.1–2.5). Пять методов: список с фильтрами <code>?status=</code> и <code>?project_id=</code>, одна задача, создание, изменение, удаление. Подсказки с кодом даны в комментариях: раскомментируйте их и убедитесь, что понимаете каждую строку.</p>
+        <p><strong>Часть 3. Проекты</strong> (<code>ProjectApiController.php</code>, TODO 3.1–3.5). Те же пять методов, но подсказки короче: пишите по образцу задач и участников. Особенность — удаление проекта с задачами запрещено (код 409).</p>
+        <p><strong>Часть 4. Перенос на свою предметную область.</strong> Вы реализовали API для примера «Задачи команды». Теперь перенесите его на предметную область вашего проекта из лабораторной работы №1: основная и связанная сущности те же, что в лабораторной работе №6, а третьим ресурсом вместо участников станет третья сущность вашей области (клиенты, исполнители, категории и т. п.). Сначала заполните карточку (третий столбец пустой):</p><table>
+<thead><tr><th>Что определить</th><th>Пример: задачи команды</th><th>Пример: интернет-магазин</th><th>Ваша область</th></tr></thead>
+<tbody>
+<tr><td>Основная сущность</td><td><code>task</code> / <code>tasks</code></td><td><code>order</code> / <code>orders</code></td><td></td></tr>
+<tr><td>Связанная сущность</td><td><code>project</code> / <code>projects</code></td><td><code>customer</code> / <code>customers</code></td><td></td></tr>
+<tr><td>Третья сущность (вместо участников)</td><td><code>user</code> / <code>users</code></td><td><code>product</code> / <code>products</code></td><td></td></tr>
+<tr><td>Поля основной сущности (4–6) и допустимые значения статуса</td><td><code>title, status, priority, due_date</code></td><td><code>title, status (new, paid, shipped), amount</code></td><td></td></tr>
+<tr><td>Поля третьей сущности (2–4)</td><td><code>name, email, role</code></td><td><code>name, price, stock</code></td><td></td></tr>
+</tbody>
+</table>
+        <div class="highlight">
+            <p><strong>Как выполнить перенос без лишних ошибок:</strong></p>
+            <ul>
+                <li>переносите только <strong>после</strong> частей 1–3 и коммита в Git (откат: <code>git checkout .</code>);</li>
+                <li>маршрутизатор, функции в <code>helpers.php</code> и <code>JsonRepository</code> менять не нужно;</li>
+                <li>что менять: имена файлов и классов (<code>TaskApiController</code> → <code>OrderApiController</code>, <code>TaskRepository</code> → <code>OrderRepository</code>), имя файла данных в модели (<code>$name</code>), адреса в <code>routes/web.php</code>, поля и допустимые значения в <code>validate()</code> и <code>clean()</code>, данные в <code>storage/*.json</code>;</li>
+                <li>сайт из лабораторной работы №6 (контроллеры <code>TaskController</code>, <code>ProjectController</code>, шаблоны) переносить <strong>не нужно</strong>: можно удалить или оставить как есть; в оценке участвует только API;</li>
+                <li>меняйте по одному ресурсу и после каждого проверяйте его запросом в Postman; после переноса просмотрите <code>git diff</code>.</li>
+            </ul>
+        </div>
+        <p>Результат Части 4: три ресурса вашей предметной области, у каждого пять операций, в файлах данных не меньше 3–5 записей. Старые адреса примера (<code>/api/tasks</code>) должны отвечать 404.</p>
+
+        <h3>Шаг 3. Документирование API</h3>
+        <p>Подготовьте описание всех реализованных конечных точек вашей предметной области в файле <code>docs/api.md</code>. Для каждой точки (не менее 5 на каждый из трёх ресурсов, всего не менее 15) укажите: HTTP-метод, URL, назначение, параметры запроса (адрес, строка запроса, тело), пример запроса, пример ответа (с кодом) и возможные ошибки. Формат блока приведён в теории, раздел 9. Чтобы не набирать примеры вручную, копируйте запросы и ответы из Postman: в Шаге 4 вы будете получать их всё равно.</p>
+        <p>Начните с краткой сводной таблицы в начале <code>docs/api.md</code>:</p><table>
+<thead><tr><th>Метод</th><th>URL</th><th>Назначение</th><th>Успешный код</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td><code>/api/orders</code></td><td>список заказов (фильтр <code>?status=</code>)</td><td>200</td></tr>
+<tr><td>GET</td><td><code>/api/orders/{id}</code></td><td>заказ по номеру</td><td>200</td></tr>
+<tr><td>POST</td><td><code>/api/orders</code></td><td>создать заказ</td><td>201</td></tr>
+<tr><td>PATCH</td><td><code>/api/orders/{id}</code></td><td>изменить заказ</td><td>200</td></tr>
+<tr><td>DELETE</td><td><code>/api/orders/{id}</code></td><td>удалить заказ</td><td>204</td></tr>
+</tbody>
+</table>
+
+        <h3>Шаг 4. Тестирование API</h3>
+        <p>Проверьте работу API в Postman (или Insomnia, или <code>curl</code>). Нужно протестировать успешные запросы, ошибочные запросы, коды состояния и формат ответов. Результаты запишите в таблицу в <code>docs/testing.md</code>:</p><table>
+<thead><tr><th>№</th><th>Запрос</th><th>Ожидаемый код</th><th>Получен код</th><th>Комментарий</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>GET /api/orders</code></td><td>200</td><td></td><td>массив записей</td></tr>
+<tr><td>2</td><td><code>POST /api/orders</code> с корректным телом</td><td>201</td><td></td><td>есть заголовок Location</td></tr>
+<tr><td>3</td><td><code>POST /api/orders</code> с коротким названием</td><td>422</td><td></td><td>есть объект errors</td></tr>
+<tr><td>4</td><td><code>POST /api/orders</code> с телом «abc»</td><td>400</td><td></td><td></td></tr>
+<tr><td>5</td><td><code>GET /api/orders/999</code></td><td>404</td><td></td><td></td></tr>
+<tr><td>6</td><td><code>DELETE /api/customers</code> (без номера)</td><td>405</td><td></td><td>заголовок Allow</td></tr>
+<tr><td>7</td><td><code>DELETE</code> связанной сущности, у которой есть записи</td><td>409</td><td></td><td>если вы оставили эту проверку</td></tr>
+</tbody>
+</table>
+        <p>Минимальный набор проверок: для <strong>каждого из трёх ресурсов</strong> выполните все пять операций с успешным результатом; кроме того, получите хотя бы по одному ответу 400, 404, 405 и 422. Сохраните скриншоты Postman с видимым методом, адресом, телом и кодом ответа в папку <code>images/</code> (не менее 6 скриншотов: по одному ключевому запросу на каждую операцию и каждую ошибку). Если вы использовали <code>curl</code>, сделайте скриншоты терминала.</p>
+        <p>Если ответ не совпал с ожидаемым, исправьте код и повторите запрос: в таблице должны остаться фактические коды ответа после исправления.</p>
+
+        <h3>Шаг 5. Подготовка итогового отчёта</h3>
+        <p>Оформите результаты работы в виде Git-репозитория с использованием Markdown (см. «Требования к оформлению»). В <code>README.md</code> опишите ресурсы (таблица из Шага 1 для вашей области), обзор API со сводной таблицей, по одному примеру запроса и ответа для каждой операции, вывод. Полная документация лежит в <code>docs/api.md</code>, результаты тестирования в <code>docs/testing.md</code>, скриншоты в <code>images/</code>.</p>
+
+        <h2>Что должно получиться в результате</h2><p>В результате выполнения лабораторной работы должны быть подготовлены:</p><ul><li>реализованный REST API;</li><li>не менее трёх ресурсов вашей предметной области;</li><li>поддержка основных CRUD-операций (GET, POST, PUT/PATCH, DELETE) для каждого ресурса;</li><li>документация API (<code>docs/api.md</code>);</li><li>результаты тестирования запросов (<code>docs/testing.md</code> и скриншоты).</li></ul>
+
+        <h3>Критерии проверки</h3><table>
+<thead><tr><th>№</th><th>Что проверяется</th><th>Балл</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Спроектированы ресурсы и реализованы основные конечные точки REST API: не менее трёх ресурсов, понятные адреса, ответы в формате JSON</td><td>1</td></tr>
+<tr><td>2</td><td>Реализована поддержка CRUD-операций с использованием HTTP-методов: список, объект по номеру, создание (201), изменение, удаление (204); ошибки возвращаются с корректными кодами (400, 404, 405, 422)</td><td>1</td></tr>
+<tr><td>3</td><td>Подготовлена документация API (метод, URL, назначение, параметры, пример запроса и ответа) и выполнено тестирование запросов: таблица результатов и скриншоты</td><td>1</td></tr>
+<tr><td>4</td><td>Репозиторий оформлен в соответствии с требованиями, документация содержит описание API и примеры запросов</td><td>1</td></tr>
+</tbody>
+</table><p>Критерии проверяются на данных вашей предметной области. При защите нужно уметь объяснить любой файл проекта, выполнить в Postman любой запрос из документации и объяснить код ответа.</p>
+
+        <h3>Повышенная сложность (по желанию)</h3><ul><li>пагинация списка: <code>?page=2&amp;limit=3</code>;</li><li>сортировка: <code>?sort=due_date</code> или <code>?sort=-due_date</code> (по убыванию);</li><li>поиск по названию: <code>?q=сайт</code>;</li><li>проверка уникальности (например, адрес почты участника) с ответом 409 при повторе;</li><li>ответ 415 Unsupported Media Type, если заголовок <code>Content-Type</code> не <code>application/json</code>.</li></ul>
+
+        <h2>Типичные ошибки</h2><table>
+<thead><tr><th>Что происходит</th><th>Вероятная причина</th></tr></thead>
+<tbody>
+<tr><td>Код 400 на корректный, как кажется, запрос</td><td>в JSON одинарные кавычки, запятая после последнего поля или Postman отправляет тело не как raw JSON</td></tr>
+<tr><td>Код 404 на адрес из документации</td><td>не зарегистрирован маршрут в <code>routes/web.php</code>, опечатка в адресе или забыли <code>/api</code></td></tr>
+<tr><td>Код 405</td><td>нет маршрута для этого метода (например, не добавили строку с <code>$router->delete</code>)</td></tr>
+<tr><td>Код 200 и пустой ответ</td><td>метод контроллера остался с одним комментарием: нет вызова <code>json_response</code></td></tr>
+<tr><td>Создание всегда даёт 422 на поле <code>project_id</code></td><td>в JSON номер записан строкой <code>"1"</code> вместо числа <code>1</code></td></tr>
+<tr><td>В ответе HTML-страница вместо JSON</td><td>в PHP произошла ошибка или адрес не начинается с <code>/api</code></td></tr>
+<tr><td>PATCH изменил не ту задачу или ничего</td><td>в адресе не тот номер; проверьте <code>GET</code> этой записи до и после</td></tr>
+<tr><td>После экспериментов в файлах данных мусор</td><td>вернуть исходные данные: <code>git checkout storage</code></td></tr>
+</tbody>
+</table>
+
+        <h2>Контрольные вопросы</h2><ol><li>Что такое ресурс в REST и чем он отличается от страницы сайта?</li><li>Почему в адресе API используют существительные во множественном числе, а не глаголы?</li><li>Какие HTTP-методы соответствуют операциям CRUD?</li><li>Чем отличаются <code>PUT</code> и <code>PATCH</code>? Как они обработаны в вашей работе?</li><li>Почему после создания возвращается код 201 и заголовок <code>Location</code>?</li><li>Почему после удаления возвращается 204 без тела?</li><li>Чем отличаются коды 400 и 422? Приведите пример запроса для каждого.</li><li>Что означает код 405 и какую роль играет заголовок <code>Allow</code>?</li><li>В каких случаях уместен код 409?</li><li>Почему данные нужно проверять на сервере, даже если клиентское приложение уже проверило их?</li><li>Зачем нужна документация API и что должно быть в описании одной конечной точки?</li><li>Какие файлы вам пришлось изменить при переносе на свою предметную область?</li></ol>
+
+        <h2>Домашняя доработка</h2><ul><li>Доделать пункты, не успевшие попасть в документацию или таблицу тестирования.</li><li>Добавить хотя бы одну возможность из раздела «Повышенная сложность».</li><li>Подготовить проект к следующей лабораторной работе: убедиться, что репозиторий в порядке, а API запускается с чистого клона.</li></ul>
+
+        <h2>Требования к оформлению</h2>
+        <p>Результаты лабораторной работы должны быть оформлены в виде Git-репозитория. Рекомендуется делать отдельные коммиты после каждого шага.</p>
+        <p>Рекомендуемая структура:</p><div class="code-block">lab7/
+├── README.md
+├── src/
+├── images/
+└── docs/
+    ├── api.md
+    └── testing.md</div>
+        <p>Файл <code>README.md</code> должен содержать:</p><ul><li>название лабораторной работы;</li><li>цель работы;</li><li>описание реализованных ресурсов;</li><li>описание REST API;</li><li>примеры запросов и ответов;</li><li>вывод.</li></ul>
+        <p>При необходимости в репозиторий добавляются:</p><ul><li>исходный код (<code>src/</code>);</li><li>снимки экрана тестирования (<code>images/</code>);</li><li>документация API (<code>docs/</code>).</li></ul>
+        <p>При оформлении рекомендуется:</p><ul><li>использовать язык разметки Markdown;</li><li>применять заголовки, списки и таблицы;</li><li>приводить примеры HTTP-запросов и JSON-ответов;</li><li>придерживаться понятной структуры каталогов и файлов.</li></ul>
+
+        <div class="footer">
+            <p>Лабораторная работа №7 — Проектирование REST API</p>
+            <p>Курс: Архитектура современных информационных систем</p>
+        </div>
+    </div>
+</body>
+</html>
