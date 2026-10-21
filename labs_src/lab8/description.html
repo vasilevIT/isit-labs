@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №8 - Проектирование и реализация базы данных</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .meta-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .meta-info p {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        em {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лабораторная работа №8</h1>
+        <h2 style="margin-top: 0; color: #3498db; border: none;">Проектирование и реализация базы данных</h2>
+
+        <div class="meta-info">
+            <p><strong>Модуль:</strong> Разработка web приложений</p>
+            <p><strong>Тема:</strong> Работа с данными в информационных системах</p>
+            <p><strong>Продолжительность:</strong> 4 академических часа</p>
+        </div>
+
+        <h2>Цель лабораторной работы</h2>
+        <p>Изучить основы проектирования реляционных баз данных, разработать структуру базы данных PostgreSQL, реализовать связи между сущностями, выполнить основные операции по работе с данными и освоить базовые методы оптимизации SQL-запросов.</p>
+        <p>В лабораторных работах №6 и №7 данные лежали в JSON-файлах: их легко испортить, в них нельзя быстро искать, и никто не проверяет, что задача ссылается на существующий проект. Теперь вы создадите для своей системы <strong>настоящую базу данных</strong>, которая сама хранит данные, следит за их правильностью и быстро их находит. Теория — в лекции 2.2 «Работа с данными в информационных системах».</p>
+
+        <h2>Необходимое программное обеспечение</h2>
+        <p><strong>Обязательное:</strong></p>
+        <ul>
+            <li>Git;</li>
+            <li>PostgreSQL 16 или выше. Проще всего запустить его в Docker (Docker Desktop, на macOS также OrbStack): в заготовке есть готовый файл <code>docker-compose.yml</code>. Без Docker — установщик с сайта <a href="https://www.postgresql.org/download/">postgresql.org/download</a> (на macOS также Postgres.app);</li>
+            <li>pgAdmin, DBeaver или другой клиент для работы с PostgreSQL. Можно обойтись консольным клиентом <code>psql</code>: он входит в PostgreSQL и в Docker-образ;</li>
+            <li>Visual Studio Code (или другой редактор кода); для предпросмотра ER-диаграмм — расширение «PlantUML»;</li>
+            <li>PHP 8.2 или выше (уже установлен после лабораторной работы №6). В этой работе он нужен только для задания повышенной сложности, в следующей — для подключения API к базе.</li>
+        </ul>
+        <p><strong>Проверка установки:</strong></p>
+        <div class="code-block">docker --version                  # Docker version 2x.x.x
+docker compose version            # Docker Compose version v2.x.x
+# или, если PostgreSQL установлен без Docker:
+psql --version                    # psql (PostgreSQL) 16.x
+php -m | grep pdo_pgsql           # pdo_pgsql — только для задания повышенной сложности</div>
+
+        <h2>Постановка задачи</h2>
+        <p>На основе архитектуры информационной системы необходимо разработать и реализовать базу данных.</p>
+        <p>В ходе работы требуется:</p>
+        <ul>
+            <li>спроектировать структуру базы данных;</li>
+            <li>создать таблицы и связи между ними;</li>
+            <li>реализовать основные CRUD-операции;</li>
+            <li>выполнить анализ и оптимизацию SQL-запросов.</li>
+        </ul>
+        <p>База данных должна обеспечивать хранение информации, необходимой для работы разработанной информационной системы.</p>
+        <div class="highlight">
+            <p><strong>Что будет и чего не будет в этой работе.</strong> Вы работаете на готовой заготовке: в ней есть файл для запуска PostgreSQL, шесть SQL-скриптов для примера «Система управления задачами команды» (часть таблиц и запросов уже написана как образец, остальное помечено <code>TODO</code> с подсказками) и шаблон ER-диаграммы. Сначала вы доделываете пример, затем переносите базу на свою предметную область из лабораторной работы №1. Подключения базы к PHP-приложению в этой работе нет: это следующая лабораторная работа (по желанию его можно сделать как задание повышенной сложности).</p>
+        </div>
+
+        <h2>Теоретическая база</h2>
+
+        <h3>1. Из чего состоит база данных</h3>
+        <div class="section">
+            <p>Реляционная база данных похожа на файл Excel с несколькими листами. Отличие в том, что база понимает <strong>связи</strong> между листами, <strong>проверяет данные</strong> и позволяет работать с ней многим программам одновременно.</p>
+            <table>
+<thead><tr><th>Термин</th><th>Что это простыми словами</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td>Таблица</td><td>набор однотипных записей, описывает одну сущность</td><td><code>tasks</code> — задачи</td></tr>
+<tr><td>Строка (запись)</td><td>один объект</td><td>одна задача</td></tr>
+<tr><td>Столбец (поле)</td><td>свойство объекта; у каждого столбца свой тип</td><td><code>title</code>, <code>status</code>, <code>due_date</code></td></tr>
+<tr><td>Первичный ключ (PK)</td><td>столбец с уникальным номером строки</td><td><code>tasks.id</code></td></tr>
+<tr><td>Внешний ключ (FK)</td><td>столбец, хранящий номер строки другой таблицы: так создаётся связь</td><td><code>tasks.project_id</code> → <code>projects.id</code></td></tr>
+<tr><td>СУБД</td><td>программа, которая управляет базой</td><td>PostgreSQL</td></tr>
+</tbody>
+</table>
+            <p>Главное правило проектирования (нормализация): <strong>одни и те же данные не хранятся в нескольких местах</strong>. В каждой ячейке одно значение (не список через запятую); каждая таблица описывает одну сущность; повторяющиеся данные выносятся в отдельную таблицу и подключаются по ключу. Например, имя исполнителя хранится один раз в <code>users</code>, а в задаче только его номер <code>assignee_id</code>.</p>
+        </div>
+
+        <h3>2. Типы данных PostgreSQL</h3>
+        <div class="section"><table>
+<thead><tr><th>Что храним</th><th>Тип</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td>номер строки (нумерация автоматическая)</td><td><code>SERIAL</code></td><td><code>id</code></td></tr>
+<tr><td>целое число, ссылка на другую таблицу</td><td><code>INTEGER</code></td><td><code>project_id</code>, количество</td></tr>
+<tr><td>короткий текст с ограничением длины</td><td><code>VARCHAR(n)</code></td><td>название, email, статус</td></tr>
+<tr><td>длинный текст</td><td><code>TEXT</code></td><td>описание, комментарий</td></tr>
+<tr><td>дата / дата и время</td><td><code>DATE</code> / <code>TIMESTAMP</code></td><td>срок, время создания</td></tr>
+<tr><td>да / нет</td><td><code>BOOLEAN</code></td><td>признак «активен»</td></tr>
+<tr><td>деньги и точные дробные числа</td><td><code>NUMERIC(12, 2)</code></td><td>цена, сумма (не <code>REAL</code> и не <code>FLOAT</code>: они хранят дроби приближённо)</td></tr>
+</tbody>
+</table></div>
+
+        <h3>3. Ограничения целостности</h3>
+        <div class="section">
+            <p>Ограничения — правила, которые описываются один раз при создании таблицы и проверяются базой при каждой записи, из какой бы программы она ни пришла.</p>
+            <table>
+<thead><tr><th>Ограничение</th><th>Что означает</th><th>Пример</th></tr></thead>
+<tbody>
+<tr><td><code>PRIMARY KEY</code></td><td>уникальный непустой номер строки</td><td><code>id SERIAL PRIMARY KEY</code></td></tr>
+<tr><td><code>REFERENCES</code></td><td>внешний ключ: значение должно существовать в другой таблице</td><td><code>project_id INTEGER REFERENCES projects (id)</code></td></tr>
+<tr><td><code>NOT NULL</code></td><td>поле обязательно</td><td><code>title VARCHAR(200) NOT NULL</code></td></tr>
+<tr><td><code>UNIQUE</code></td><td>значение не повторяется</td><td><code>email VARCHAR(255) UNIQUE</code></td></tr>
+<tr><td><code>CHECK</code></td><td>значение удовлетворяет условию</td><td><code>CHECK (status IN ('new', 'in_progress', 'done'))</code></td></tr>
+<tr><td><code>DEFAULT</code></td><td>значение по умолчанию</td><td><code>status VARCHAR(20) DEFAULT 'new'</code></td></tr>
+</tbody>
+</table>
+            <p>Если запрос нарушает правило, PostgreSQL отказывается его выполнять и называет нарушенное ограничение:</p>
+            <div class="code-block">INSERT INTO tasks (project_id, title) VALUES (99, 'Задача без проекта');
+ERROR:  insert or update on table "tasks" violates foreign key constraint "tasks_project_id_fkey"
+DETAIL:  Key (project_id)=(99) is not present in table "projects".</div>
+        </div>
+
+        <h3>4. Связи между таблицами</h3>
+        <div class="section">
+            <table>
+<thead><tr><th>Связь</th><th>Пример</th><th>Как реализуется</th></tr></thead>
+<tbody>
+<tr><td>один ко многим (1:N)</td><td>у проекта много задач, у задачи один проект</td><td>в таблице «многих» внешний ключ: <code>tasks.project_id</code>. Самая частая связь</td></tr>
+<tr><td>один к одному (1:1)</td><td>у участника не больше одного профиля</td><td>внешний ключ, который одновременно является первичным: <code>user_profiles.user_id PRIMARY KEY REFERENCES users (id)</code></td></tr>
+<tr><td>многие ко многим (N:M)</td><td>у задачи много тегов, тег у многих задач</td><td>связующая таблица <code>task_tags (task_id, tag_id)</code> с составным первичным ключом</td></tr>
+</tbody>
+</table>
+            <p>При создании внешнего ключа решают, что делать, если удаляют строку, на которую ссылаются:</p>
+            <table>
+<thead><tr><th>Вариант</th><th>Что происходит</th><th>Когда подходит</th></tr></thead>
+<tbody>
+<tr><td><code>ON DELETE RESTRICT</code> (или ничего не писать)</td><td>удаление запрещено, пока есть ссылки</td><td>проект с задачами (в API лабораторной работы №7 это ответ 409)</td></tr>
+<tr><td><code>ON DELETE CASCADE</code></td><td>зависимые строки удаляются вместе с главной</td><td>комментарии задачи, строки связующей таблицы</td></tr>
+<tr><td><code>ON DELETE SET NULL</code></td><td>ссылка становится пустой</td><td>исполнитель задачи уволился, задача осталась</td></tr>
+</tbody>
+</table>
+        </div>
+
+        <h3>5. ER-диаграмма</h3>
+        <div class="section">
+            <p><strong>ER-диаграмма</strong> (Entity–Relationship, «сущность — связь») показывает таблицы, их поля и связи. Мы рисуем её в PlantUML, как диаграммы в лабораторных работах №2–4: текстовый файл <code>.puml</code> хранится в Git, а картинка получается из него автоматически.</p>
+            <div class="code-block">entity "projects" as projects {
+    * id : SERIAL &lt;&lt;PK&gt;&gt;
+    --
+    * title : VARCHAR(150) &lt;&lt;UNIQUE&gt;&gt;
+    * owner_id : INTEGER &lt;&lt;FK&gt;&gt;
+}
+users ||--o{ projects : "1 : N"     ' один участник — много проектов
+users ||--o| user_profiles : "1 : 1"
+tasks ||--o{ task_tags : "N : M"    ' N:M рисуется через связующую таблицу</div>
+            <p>Значки на концах линии: <code>||</code> — ровно один, <code>|o</code> — ноль или один, <code>o{</code> — ноль или много. Пример готовой диаграммы для системы управления задачами:</p>
+            <p style="text-align:center"><img src="data:image/png;base64,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" alt="ER-диаграмма примера: users, user_profiles, projects, tasks, comments, tags, task_tags" style="max-width:100%; border:1px solid #ddd; border-radius:5px;"></p>
+        </div>
+
+        <h3>6. Как работать с PostgreSQL</h3>
+        <div class="section">
+            <p><strong>С Docker.</strong> В папке с <code>docker-compose.yml</code> выполните <code>docker compose up -d</code> — запустится PostgreSQL 16 с пустой базой <code>taskdb</code>. Консоль: <code>docker compose exec db psql -U postgres -d taskdb</code>. Папка <code>sql/</code> видна внутри контейнера как <code>/sql</code>, поэтому скрипт выполняется командой <code>\i /sql/01_schema.sql</code>.</p>
+            <p><strong>Без Docker.</strong> Создайте базу (<code>CREATE DATABASE taskdb;</code>), подключитесь к ней (<code>psql -U postgres -d taskdb</code>) и выполняйте скрипты по пути на своём компьютере: <code>\i sql/01_schema.sql</code> (запускайте psql из папки <code>lab8</code>). В pgAdmin и DBeaver откройте файл в редакторе запросов (Query Tool / SQL Editor) и выполните его целиком.</p>
+            <p>Параметры подключения для pgAdmin и DBeaver: хост <code>localhost</code>, порт <code>5432</code>, база <code>taskdb</code>, пользователь <code>postgres</code>, пароль <code>secret</code> (задан в <code>docker-compose.yml</code>).</p>
+            <table>
+<thead><tr><th>Команда psql</th><th>Что делает</th></tr></thead>
+<tbody>
+<tr><td><code>\dt</code></td><td>список таблиц</td></tr>
+<tr><td><code>\d tasks</code></td><td>структура таблицы: столбцы, типы, ограничения, индексы, внешние ключи</td></tr>
+<tr><td><code>\i /sql/01_schema.sql</code></td><td>выполнить SQL из файла</td></tr>
+<tr><td><code>\x</code></td><td>переключить вывод «столбиком» (удобно для широких строк)</td></tr>
+<tr><td><code>\q</code></td><td>выйти</td></tr>
+</tbody>
+</table>
+            <p>Команды с обратной косой чертой работают только в psql. Обычные SQL-команды заканчиваются точкой с запятой: без неё psql ждёт продолжения (приглашение меняется на <code>taskdb-#</code>).</p>
+        </div>
+
+        <h3>7. CRUD-операции и REST API</h3>
+        <div class="section">
+            <p>Каждому методу REST API из лабораторной работы №7 соответствует команда SQL:</p>
+            <table>
+<thead><tr><th>Операция</th><th>REST API</th><th>SQL</th></tr></thead>
+<tbody>
+<tr><td>Create</td><td><code>POST /api/tasks</code></td><td><code>INSERT INTO tasks (title, project_id) VALUES ('...', 1) RETURNING id;</code></td></tr>
+<tr><td>Read (список)</td><td><code>GET /api/tasks?status=done</code></td><td><code>SELECT id, title FROM tasks WHERE status = 'done' ORDER BY due_date;</code></td></tr>
+<tr><td>Read (одна)</td><td><code>GET /api/tasks/5</code></td><td><code>SELECT ... FROM tasks WHERE id = 5;</code></td></tr>
+<tr><td>Update</td><td><code>PATCH /api/tasks/5</code></td><td><code>UPDATE tasks SET status = 'done' WHERE id = 5;</code></td></tr>
+<tr><td>Delete</td><td><code>DELETE /api/tasks/5</code></td><td><code>DELETE FROM tasks WHERE id = 5;</code></td></tr>
+</tbody>
+</table>
+            <p>Три правила, которые спасают от самых частых ошибок:</p>
+            <ul>
+                <li><strong><code>UPDATE</code> и <code>DELETE</code> всегда с <code>WHERE</code>.</strong> Без условия изменятся или удалятся все строки таблицы. Перед изменением выполните <code>SELECT</code> с тем же <code>WHERE</code>;</li>
+                <li><strong>пустое значение проверяется через <code>IS NULL</code></strong>, а не <code>= NULL</code>: сравнение с <code>NULL</code> знаком равенства никогда не даёт истину;</li>
+                <li><strong>для необязательной связи нужен <code>LEFT JOIN</code>.</strong> Обычный <code>JOIN</code> оставляет только строки, у которых есть пара: задачи без исполнителя пропадут из результата.</li>
+            </ul>
+        </div>
+
+        <h3>8. Индексы и EXPLAIN ANALYZE</h3>
+        <div class="section">
+            <p><strong>Индекс</strong> — вспомогательная структура, как алфавитный указатель в конце книги: вместо чтения всей таблицы база сразу находит нужные строки. PostgreSQL сам создаёт индексы только для <code>PRIMARY KEY</code> и <code>UNIQUE</code>. Для внешних ключей и столбцов из частых условий <code>WHERE</code> и <code>ORDER BY</code> индексы создаёте вы:</p>
+            <div class="code-block">CREATE INDEX idx_tasks_project_id ON tasks (project_id);                -- по одному столбцу
+CREATE INDEX idx_tasks_assignee_status ON tasks (assignee_id, status);  -- составной, по двум</div>
+            <p><strong>Как узнать, помог ли индекс.</strong> Команда <code>EXPLAIN ANALYZE</code> перед запросом выполняет его и показывает <strong>план</strong> — способ, которым база искала данные, — и фактическое время. План читается снизу вверх:</p>
+            <table>
+<thead><tr><th>В плане</th><th>Что это значит</th></tr></thead>
+<tbody>
+<tr><td><code>Seq Scan</code>, <code>Parallel Seq Scan</code></td><td>полный перебор таблицы (на больших таблицах — медленно)</td></tr>
+<tr><td><code>Rows Removed by Filter</code></td><td>сколько строк прочитано зря</td></tr>
+<tr><td><code>Index Scan</code>, <code>Bitmap Index Scan</code></td><td>поиск по индексу</td></tr>
+<tr><td><code>Sort</code></td><td>отдельная сортировка результата</td></tr>
+<tr><td><code>Execution Time</code></td><td>общее время выполнения в миллисекундах — его сравниваем «до» и «после»</td></tr>
+</tbody>
+</table>
+            <div class="code-block">EXPLAIN ANALYZE SELECT id, title FROM tasks WHERE project_id = 500;
+
+-- до индекса:     Parallel Seq Scan on tasks ... Rows Removed by Filter: 166505 ...  Execution Time: 14.899 ms
+-- после индекса:  Bitmap Index Scan on idx_tasks_project_id ...                    Execution Time: 0.556 ms</div>
+            <div class="highlight">
+                <p><strong>На маленьких таблицах индексы не видны.</strong> На 7 задачах PostgreSQL всегда выберет перебор: прочитать одну страницу таблицы быстрее, чем обращаться к индексу. Поэтому для оптимизации в заготовке есть скрипт <code>05_test_data.sql</code>, который за 10–30 секунд добавляет 500 000 задач.</p>
+            </div>
+            <p>У индекса есть цена: он занимает место на диске и замедляет <code>INSERT</code>, <code>UPDATE</code> и <code>DELETE</code> (базе нужно обновить и таблицу, и все её индексы). Индекс не помогает, если запрос читает большую часть таблицы или ищет подстроку <code>LIKE '%слово%'</code>. Поэтому индексы создают только для частых запросов и всегда проверяют <code>EXPLAIN ANALYZE</code>.</p>
+        </div>
+
+        <h3>9. Как искать ошибки</h3>
+        <div class="section">
+            <ol>
+                <li>Читайте сообщение PostgreSQL целиком: в нём есть номер строки скрипта (<code>psql:/sql/01_schema.sql:42</code>), а в строке <code>DETAIL</code> — какое значение нарушило правило.</li>
+                <li><code>relation "tasks" does not exist</code> — таблицы нет: не выполнен <code>01_schema.sql</code>, опечатка в имени или вы подключены не к той базе (<code>\c taskdb</code>).</li>
+                <li><code>syntax error at or near ...</code> — смотрите на слово, указанное в сообщении, и на строку перед ним: чаще всего пропущена запятая между столбцами или лишняя запятая после последнего столбца.</li>
+                <li><code>current transaction is aborted</code> — внутри <code>BEGIN</code> была ошибка; выполните <code>ROLLBACK;</code>.</li>
+                <li>Приглашение psql сменилось на <code>taskdb-#</code> или <code>taskdb'#</code> — не закрыта команда (нет <code>;</code>) или кавычка. Нажмите <code>Ctrl+C</code>.</li>
+                <li>Порядок создания важен: таблица, на которую ссылаются (<code>projects</code>), должна быть создана раньше таблицы со ссылкой (<code>tasks</code>), а в <code>DROP TABLE</code> — наоборот.</li>
+            </ol>
+        </div>
+
+        <h2>Структура заготовки проекта</h2>
+
+        <div class="code-block">lab8/
+├── docker-compose.yml          # PostgreSQL 16 с базой taskdb (ГОТОВО)
+├── sql/
+│   ├── 01_schema.sql           # Часть 1: таблицы (users, tags — ГОТОВО; TODO 1.1 – 1.5)
+│   ├── 02_seed.sql             # Часть 2: данные (участники, профили, проекты — ГОТОВО; TODO 2.1 – 2.2)
+│   ├── 03_integrity.sql        # Часть 3: проверка ограничений (две проверки — ГОТОВО; TODO 3.1 – 3.4)
+│   ├── 04_crud.sql             # Часть 4: CRUD (INSERT — ГОТОВО; TODO 4.1 – 4.8)
+│   ├── 05_test_data.sql        # 500 000 задач для проверки скорости (ГОТОВО)
+│   └── 06_optimization.sql     # Часть 5: EXPLAIN ANALYZE (запрос 1 — ГОТОВО; TODO 5.1 – 5.4)
+└── diagrams/
+    └── src/er.puml             # шаблон ER-диаграммы (две сущности — образец)</div>
+
+        <h2>Этапы выполнения</h2>
+
+        <p>Работа выполняется на готовой заготовке. Задания в скриптах помечены словом <code>TODO</code>, после каждого есть строка «✔ Проверка»: выполнили задание, запустили скрипт, проверили, только потом следующее. Скрипты можно запускать повторно: <code>01_schema.sql</code> сначала удаляет старые таблицы. После каждого шага делайте коммит в Git.</p>
+
+        <p>Ориентировочное время (всего 4 академических часа = 180 минут):</p><table>
+<thead><tr><th>Шаг</th><th>Минут</th></tr></thead>
+<tbody>
+<tr><td>0. Подготовка и запуск PostgreSQL</td><td>10</td></tr>
+<tr><td>1. Проектирование структуры базы данных</td><td>25</td></tr>
+<tr><td>2. Создание базы данных (части 1–2)</td><td>20</td></tr>
+<tr><td>3. Реализация связей и проверка целостности (часть 3)</td><td>15</td></tr>
+<tr><td>4. CRUD-операции (часть 4)</td><td>25</td></tr>
+<tr><td>5. Оптимизация SQL-запросов (часть 5)</td><td>25</td></tr>
+<tr><td>6. Перенос на свою предметную область</td><td>45</td></tr>
+<tr><td>7. Итоговый отчёт</td><td>15</td></tr>
+</tbody>
+</table>
+
+        <h3>Шаг 0. Подготовка и запуск PostgreSQL</h3>
+        <ol>
+            <li>Скопируйте заготовку в каталог <code>lab8/</code> своего репозитория, сделайте первый коммит и откройте папку в VS Code.</li>
+            <li>В папке <code>lab8</code> выполните <code>docker compose up -d</code>, затем <code>docker compose exec db psql -U postgres -d taskdb</code>. Появится приглашение <code>taskdb=#</code>. Без Docker создайте базу <code>taskdb</code> и подключитесь к ней (теория, раздел 6).</li>
+            <li>Проверьте, что сервер отвечает: <code>SELECT version();</code> — строка начинается с <code>PostgreSQL 16</code>.</li>
+            <li>Выполните <code>\i /sql/01_schema.sql</code> и <code>\dt</code>: должны появиться две готовые таблицы, <code>users</code> и <code>tags</code>.</li>
+        </ol>
+
+        <h3>Шаг 1. Проектирование структуры базы данных</h3>
+        <p>Изучите ER-диаграмму примера (теория, раздел 5) и таблицу <code>users</code> в <code>01_schema.sql</code>: так описывается каждая сущность. Затем спроектируйте базу <strong>своей предметной области</strong> из лабораторной работы №1. Сущности и поля у вас уже есть: это ресурсы API из лабораторной работы №7. Заполните карточку (третий столбец пустой):</p>
+        <table>
+<thead><tr><th>Что определить</th><th>Пример: задачи команды</th><th>Пример: интернет-магазин</th><th>Ваша область</th></tr></thead>
+<tbody>
+<tr><td>Основная сущность</td><td><code>tasks</code></td><td><code>orders</code></td><td></td></tr>
+<tr><td>Связанная сущность (1:N к основной)</td><td><code>projects</code></td><td><code>customers</code></td><td></td></tr>
+<tr><td>Третья сущность</td><td><code>users</code> (исполнитель задачи)</td><td><code>products</code></td><td></td></tr>
+<tr><td>Связь N:M и связующая таблица</td><td>задачи — теги, <code>task_tags</code></td><td>заказы — товары, <code>order_items</code> (+ количество, цена)</td><td></td></tr>
+<tr><td>Связь 1:1</td><td>участник — профиль, <code>user_profiles</code></td><td>покупатель — адрес доставки, <code>customer_addresses</code></td><td></td></tr>
+<tr><td>Ещё одна сущность 1:N</td><td><code>comments</code> к задачам</td><td><code>payments</code> по заказам</td><td></td></tr>
+<tr><td>Поля основной сущности и ограничения</td><td><code>title</code> (не короче 3), <code>status</code> (new, in_progress, done), <code>priority</code>, <code>due_date</code></td><td><code>status</code> (new, paid, shipped), <code>amount NUMERIC(12,2)</code> (≥ 0), <code>created_at</code></td><td></td></tr>
+</tbody>
+</table>
+        <p>Требования к своей базе: <strong>не меньше 5 таблиц</strong>; у каждой первичный ключ; не меньше трёх внешних ключей; связь «один ко многим» обязательна, связи «многие ко многим» и «один к одному» — по одной (если в вашей области нет естественной связи N:M, добавьте теги или категории). Для каждого поля определите тип и ограничения (<code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code>, <code>DEFAULT</code>), для каждого внешнего ключа — поведение при удалении.</p>
+        <p>Нарисуйте ER-диаграмму своей базы в <code>diagrams/src/er.puml</code> (в шаблоне две сущности как образец синтаксиса) и сохраните картинку в <code>diagrams/images/er.png</code>: в VS Code — команда «PlantUML: Export Current Diagram», без расширения — сайт <a href="https://www.plantuml.com/plantuml">plantuml.com/plantuml</a>.</p>
+
+        <h3>Шаг 2. Создание базы данных</h3>
+        <p><strong>Часть 1. Таблицы</strong> (<code>01_schema.sql</code>, TODO 1.1–1.5). Создайте недостающие таблицы примера: профили (1:1), проекты, задачи, комментарии и связующую таблицу задач и тегов. В TODO 1.1, 1.2 и 1.5 код дан в подсказке: раскомментируйте его и разберитесь в каждой строке. Таблицы задач и комментариев (TODO 1.3, 1.4) напишите сами по описанию. После каждого TODO запускайте <code>\i /sql/01_schema.sql</code>.</p>
+        <p><strong>Часть 2. Данные</strong> (<code>02_seed.sql</code>, TODO 2.1–2.2). Добавьте задачи (те же, что в лабораторной работе №7), комментарии и связи задач с тегами. Перед повторным запуском <code>02_seed.sql</code> выполняйте <code>01_schema.sql</code>: иначе данные добавятся второй раз и сработают ограничения <code>UNIQUE</code>.</p>
+        <p>✔ Результат шага: <code>\dt</code> показывает 7 таблиц, <code>\d tasks</code> — ограничения и внешние ключи, <code>SELECT COUNT(*) FROM tasks;</code> возвращает 7.</p>
+
+        <h3>Шаг 3. Реализация связей между сущностями</h3>
+        <p><strong>Часть 3</strong> (<code>03_integrity.sql</code>, TODO 3.1–3.4). Связи уже созданы внешними ключами, теперь проверим, что база действительно их соблюдает. Каждый запрос в этом файле специально нарушает правило: ошибка <code>ERROR</code> здесь означает успех. Две проверки готовы, допишите остальные: <code>CHECK</code>, <code>NOT NULL</code>, <code>UNIQUE</code>, повторный профиль (1:1), повторный тег (N:M), удаление проекта с задачами (<code>RESTRICT</code>). Проверки <code>CASCADE</code> и <code>SET NULL</code> выполняются успешно, поэтому их оборачивают в транзакцию <code>BEGIN ... ROLLBACK</code>, чтобы не потерять данные.</p>
+
+        <h3>Шаг 4. Выполнение CRUD-операций</h3>
+        <p><strong>Часть 4</strong> (<code>04_crud.sql</code>, TODO 4.1–4.8). Создание задачи готово как образец. Допишите: добавление тегов, выборку списка с фильтром и сортировкой, выборку одной записи, объединение таблиц (<code>JOIN</code> и <code>LEFT JOIN</code>), выборку по связи N:M, отчёт с <code>GROUP BY</code>, изменение и удаление. Рядом с каждым запросом указан адрес API, который будет его выполнять в следующей лабораторной работе.</p>
+        <div class="highlight">
+            <p><strong>Номера не возвращаются.</strong> Новая задача получит номер 12, а не 8: номера 8–11 израсходованы на неудачные вставки в <code>03_integrity.sql</code>. Счётчик <code>SERIAL</code> не возвращает номера, даже если вставка закончилась ошибкой. Пропуски в <code>id</code> — это нормально, не пытайтесь их «починить».</p>
+        </div>
+
+        <h3>Шаг 5. Оптимизация SQL-запросов</h3>
+        <ol>
+            <li>Выполните <code>\i /sql/05_test_data.sql</code>: в базе станет 500 000 задач и 1 000 000 комментариев.</li>
+            <li>Разберите готовый запрос 1 в <code>06_optimization.sql</code>: план до индекса, создание индекса, план после.</li>
+            <li><strong>Часть 5</strong> (TODO 5.1–5.4): по образцу оптимизируйте ещё три частых запроса (для двух из них индекс нужно подобрать самостоятельно) и найдите два запроса, которым индекс не помогает.</li>
+            <li>Для каждого запроса запишите в таблицу: что за запрос, какой индекс, план до и после (<code>Seq Scan</code> → <code>Index Scan</code>), время до и после, во сколько раз быстрее.</li>
+        </ol>
+        <p>Время на разных компьютерах разное, важно соотношение. Если «после» в плане по-прежнему <code>Seq Scan</code>, проверьте: создан ли индекс (<code>\d tasks</code>), выполнен ли <code>05_test_data.sql</code>, не подходит ли условию большая часть строк.</p>
+
+        <h3>Шаг 6. Перенос на свою предметную область</h3>
+        <p>Вы реализовали базу для примера «Задачи команды». Теперь перенесите её на свою базу из Шага 1. Работа та же, что в шагах 2–5, только с вашими таблицами.</p>
+        <p>Как выполнить перенос без лишних ошибок:</p>
+        <ul>
+            <li>переносите только <strong>после</strong> шагов 2–5 и коммита в Git: решённый пример останется в истории как образец;</li>
+            <li>начните с <code>01_schema.sql</code>: замените таблицы примера своими (не забудьте список в <code>DROP TABLE</code>), запускайте файл после каждой новой таблицы;</li>
+            <li>в <code>02_seed.sql</code> — не меньше 5 записей в основной таблице и по 3–5 в остальных, обязательно с записями, у которых необязательные поля пустые;</li>
+            <li>в <code>03_integrity.sql</code> — не меньше 6 проверок для своих ограничений и связей, включая каждый вариант <code>ON DELETE</code>, который вы используете;</li>
+            <li>в <code>04_crud.sql</code> — для основной сущности все четыре операции, плюс <code>JOIN</code>, выборка по связи N:M и отчёт с <code>GROUP BY</code>;</li>
+            <li>в <code>05_test_data.sql</code> замените имена таблиц, столбцов и допустимые значения; основная таблица — не меньше 100 000 строк;</li>
+            <li>в <code>06_optimization.sql</code> — не меньше трёх частых запросов своей системы (подсказка: внешние ключи, фильтры и сортировки из вашего API), для каждого план и время до и после индекса.</li>
+        </ul>
+        <p>Результат Шага 6: все скрипты выполняются по порядку <code>01</code> → <code>06</code> на пустой базе без неожиданных ошибок; ER-диаграмма соответствует таблицам.</p>
+
+        <h3>Шаг 7. Подготовка итогового отчёта</h3>
+        <p>Оформите результаты работы в виде Git-репозитория с использованием Markdown (см. «Требования к оформлению»). В <code>README.md</code> опишите свою базу: карточку из Шага 1, ER-диаграмму, таблицы с полями, типами и ограничениями, связи и их поведение при удалении, примеры SQL-запросов, таблицу результатов оптимизации, вывод. Скриншоты выполнения скриптов (структура таблиц, ошибки ограничений, результаты CRUD, планы <code>EXPLAIN ANALYZE</code> до и после) сохраните в <code>images/</code>.</p>
+
+        <h2>Что должно получиться в результате</h2>
+        <p>В результате выполнения лабораторной работы должны быть подготовлены:</p>
+        <ul>
+            <li>структура базы данных PostgreSQL вашей предметной области (не меньше 5 таблиц);</li>
+            <li>ER-диаграмма базы данных (<code>diagrams/src/er.puml</code> и <code>diagrams/images/er.png</code>);</li>
+            <li>реализованные связи между сущностями и проверка ссылочной целостности (<code>sql/03_integrity.sql</code>);</li>
+            <li>SQL-скрипты создания таблиц и заполнения данными (<code>sql/01_schema.sql</code>, <code>sql/02_seed.sql</code>);</li>
+            <li>SQL-запросы для выполнения CRUD-операций (<code>sql/04_crud.sql</code>);</li>
+            <li>пример анализа и оптимизации не менее трёх SQL-запросов (<code>sql/06_optimization.sql</code> и таблица результатов в <code>README.md</code>).</li>
+        </ul>
+
+        <h2>Критерии проверки</h2>
+        <table>
+<thead><tr><th>№</th><th>Что проверяется</th><th>Балл</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Разработана структура базы данных и реализованы связи между сущностями: не менее 5 таблиц, первичные и внешние ключи, связи 1:N и хотя бы одна из N:M или 1:1, ER-диаграмма соответствует таблицам</td><td>1</td></tr>
+<tr><td>2</td><td>Реализованы SQL-скрипты создания таблиц и CRUD-операции: ограничения целостности, проверка ссылочной целостности, запросы INSERT, SELECT (в том числе с JOIN), UPDATE, DELETE</td><td>1</td></tr>
+<tr><td>3</td><td>Выполнен анализ и оптимизация SQL-запросов: не менее трёх запросов, планы EXPLAIN ANALYZE до и после, созданные индексы, сравнение времени</td><td>1</td></tr>
+<tr><td>4</td><td>Репозиторий оформлен в соответствии с требованиями, документация содержит описание структуры базы данных и SQL-скрипты</td><td>1</td></tr>
+</tbody>
+</table>
+        <p>Критерии проверяются на базе вашей предметной области. При защите нужно уметь объяснить любую таблицу и ограничение, выполнить любой скрипт с пустой базы, прочитать план <code>EXPLAIN ANALYZE</code> и объяснить, почему индекс помог или не помог.</p>
+
+        <h2>Повышенная сложность (по желанию)</h2>
+        <ul>
+            <li>поиск по части названия с индексом: расширение <code>pg_trgm</code> и индекс <code>CREATE INDEX ... USING gin (title gin_trgm_ops)</code>; сравните план запроса <code>ILIKE '%...%'</code> до и после;</li>
+            <li>частичный индекс только по незавершённым задачам: <code>CREATE INDEX ... ON tasks (due_date) WHERE status &lt;&gt; 'done'</code>; сравните его размер с обычным;</li>
+            <li>представление (<code>CREATE VIEW</code>) для отчёта руководителя и запрос к нему;</li>
+            <li>транзакция из нескольких шагов (например, «передать все задачи одного участника другому и удалить первого») с проверкой, что при ошибке ничего не изменилось;</li>
+            <li>отдельный пользователь базы для приложения с минимальными правами (<code>CREATE ROLE ... GRANT SELECT, INSERT, UPDATE, DELETE ...</code>);</li>
+            <li>подключение к базе из PHP через PDO (лекция 2.2, раздел «Как приложение работает с базой данных»): скрипт, который выводит список задач из PostgreSQL с подготовленным запросом.</li>
+        </ul>
+
+        <h2>Типичные ошибки</h2>
+        <table>
+<thead><tr><th>Что происходит</th><th>Вероятная причина</th></tr></thead>
+<tbody>
+<tr><td><code>relation "..." does not exist</code></td><td>таблица ещё не создана, опечатка в имени или подключение не к той базе</td></tr>
+<tr><td><code>syntax error at or near ")"</code> в <code>CREATE TABLE</code></td><td>запятая после последнего столбца или ограничения</td></tr>
+<tr><td>ошибка внешнего ключа при создании таблицы</td><td>таблица, на которую ссылаются, создаётся позже; поменяйте порядок <code>CREATE TABLE</code></td></tr>
+<tr><td>ошибки <code>duplicate key</code> при запуске <code>02_seed.sql</code></td><td>данные уже добавлены; сначала выполните <code>01_schema.sql</code></td></tr>
+<tr><td><code>WHERE assignee_id = NULL</code> возвращает 0 строк</td><td>нужно <code>IS NULL</code></td></tr>
+<tr><td>после <code>JOIN</code> пропали строки</td><td>у части строк нет пары; нужен <code>LEFT JOIN</code></td></tr>
+<tr><td><code>UPDATE 7</code> вместо <code>UPDATE 1</code></td><td>забыли <code>WHERE</code>; верните данные: <code>01_schema.sql</code> + <code>02_seed.sql</code></td></tr>
+<tr><td>после создания индекса в плане всё равно <code>Seq Scan</code></td><td>мало данных (не выполнен <code>05_test_data.sql</code>), условию подходит большая часть строк, поиск <code>'%...%'</code> или условие не по первому столбцу составного индекса</td></tr>
+<tr><td><code>current transaction is aborted</code></td><td>ошибка внутри <code>BEGIN</code>; выполните <code>ROLLBACK;</code></td></tr>
+<tr><td><code>port is already allocated</code> при <code>docker compose up</code></td><td>порт 5432 занят другим PostgreSQL; остановите его или запустите <code>DB_PORT=5433 docker compose up -d</code> и подключайтесь к порту 5433</td></tr>
+</tbody>
+</table>
+
+        <h2>Контрольные вопросы</h2>
+        <ol>
+            <li>Чем база данных отличается от хранения данных в JSON-файлах, как в лабораторной работе №7?</li>
+            <li>Что такое первичный и внешний ключ? Приведите примеры из своей базы.</li>
+            <li>Какие бывают связи между таблицами и как реализуется каждая из них?</li>
+            <li>Зачем нужна связующая таблица и почему у неё составной первичный ключ?</li>
+            <li>Как реализовать связь «один к одному» и чем она отличается от «один ко многим» в SQL?</li>
+            <li>Назовите ограничения целостности, которые вы использовали, и зачем нужно каждое.</li>
+            <li>Чем отличаются <code>ON DELETE RESTRICT</code>, <code>CASCADE</code> и <code>SET NULL</code>? Где вы применили каждый вариант?</li>
+            <li>Что такое нормализация? Приведите пример данных, которые нельзя хранить в одной таблице.</li>
+            <li>Какие команды SQL соответствуют операциям CRUD и методам REST API?</li>
+            <li>Чем <code>JOIN</code> отличается от <code>LEFT JOIN</code>? Когда нужен второй?</li>
+            <li>Почему нельзя писать <code>WHERE ... = NULL</code>?</li>
+            <li>Что такое индекс? Почему PostgreSQL не создаёт индексы для внешних ключей сам?</li>
+            <li>Что показывает <code>EXPLAIN ANALYZE</code>? Чем <code>Seq Scan</code> отличается от <code>Index Scan</code>?</li>
+            <li>Почему индекс иногда не используется, даже если он есть?</li>
+            <li>Какую цену приходится платить за индексы?</li>
+        </ol>
+
+        <h2>Домашняя доработка</h2>
+        <ul>
+            <li>Доделать пункты, не успевшие попасть в скрипты или отчёт.</li>
+            <li>Доработать схему по замечаниям преподавателя.</li>
+            <li>Добавить хотя бы одну возможность из раздела «Повышенная сложность».</li>
+            <li>Подготовить проект к следующей лабораторной работе: убедиться, что все скрипты выполняются по порядку на пустой базе, а запросы из <code>04_crud.sql</code> покрывают все методы вашего REST API.</li>
+        </ul>
+
+        <h2>Требования к оформлению</h2>
+        <p>Результаты лабораторной работы должны быть оформлены в виде Git-репозитория. Рекомендуется делать отдельные коммиты после каждого шага.</p>
+        <p>Рекомендуемая структура:</p>
+        <div class="code-block">lab8/
+├── README.md
+├── docker-compose.yml
+├── sql/
+├── diagrams/
+│   ├── images/
+│   └── src/
+├── images/
+└── docs/</div>
+        <p>Файл <code>README.md</code> должен содержать:</p>
+        <ul>
+            <li>название лабораторной работы;</li>
+            <li>цель работы;</li>
+            <li>описание структуры базы данных (ER-диаграмма, таблицы, поля, типы, ограничения);</li>
+            <li>описание связей между сущностями;</li>
+            <li>примеры SQL-запросов;</li>
+            <li>результаты оптимизации запросов;</li>
+            <li>вывод.</li>
+        </ul>
+        <p>При необходимости в репозиторий добавляются:</p>
+        <ul>
+            <li>SQL-скрипты (<code>sql/</code>);</li>
+            <li>ER-диаграммы (<code>diagrams/</code>);</li>
+            <li>снимки экрана (<code>images/</code>);</li>
+            <li>дополнительные материалы (<code>docs/</code>), например полные планы выполнения запросов.</li>
+        </ul>
+        <p>При оформлении рекомендуется:</p>
+        <ul>
+            <li>использовать язык разметки Markdown;</li>
+            <li>применять заголовки, списки и таблицы;</li>
+            <li>сопровождать SQL-код пояснениями;</li>
+            <li>придерживаться понятной структуры каталогов и файлов.</li>
+        </ul>
+
+        <div class="footer">
+            <p>Лабораторная работа №8 — Проектирование и реализация базы данных</p>
+            <p>Курс: Архитектура современных информационных систем</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+@startuml er
+' ER-диаграмма базы данных «Система управления задачами команды»
+' PK — первичный ключ, FK — внешний ключ, * — обязательное поле (NOT NULL)
+
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    ArrowColor #555555
+    HeaderBackgroundColor #E8F0FE
+}
+
+entity "users\nучастники" as users {
+    * id : SERIAL <<PK>>
+    --
+    * name : VARCHAR(100)
+    * email : VARCHAR(255) <<UNIQUE>>
+    * role : VARCHAR(20) <<CHECK>>
+    * created_at : TIMESTAMP
+}
+
+entity "user_profiles\nпрофили" as user_profiles {
+    * user_id : INTEGER <<PK, FK>>
+    --
+    position : VARCHAR(100)
+    phone : VARCHAR(20)
+    telegram : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "projects\nпроекты" as projects {
+    * id : SERIAL <<PK>>
+    --
+    * title : VARCHAR(150) <<UNIQUE>>
+    description : TEXT
+    * owner_id : INTEGER <<FK>>
+    * created_at : TIMESTAMP
+}
+
+entity "tasks\nзадачи" as tasks {
+    * id : SERIAL <<PK>>
+    --
+    * project_id : INTEGER <<FK>>
+    assignee_id : INTEGER <<FK>>
+    * title : VARCHAR(200) <<CHECK>>
+    * status : VARCHAR(20) <<CHECK>>
+    * priority : VARCHAR(10) <<CHECK>>
+    due_date : DATE
+    * created_at : TIMESTAMP
+}
+
+entity "comments\nкомментарии" as comments {
+    * id : SERIAL <<PK>>
+    --
+    * task_id : INTEGER <<FK>>
+    * author_id : INTEGER <<FK>>
+    * body : TEXT
+    * created_at : TIMESTAMP
+}
+
+entity "tags\nтеги" as tags {
+    * id : SERIAL <<PK>>
+    --
+    * name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "task_tags\nтеги задач" as task_tags {
+    * task_id : INTEGER <<PK, FK>>
+    * tag_id : INTEGER <<PK, FK>>
+}
+
+users ||--o| user_profiles : "1 : 1\nпрофиль"
+users ||--o{ projects : "1 : N\nруководитель"
+users |o--o{ tasks : "1 : N\nисполнитель"
+projects ||--o{ tasks : "1 : N\nзадачи проекта"
+tasks ||--o{ comments : "1 : N"
+users ||--o{ comments : "1 : N\nавтор"
+tasks ||--o{ task_tags : "N : M"
+tags ||--o{ task_tags : "N : M"
+@enduml

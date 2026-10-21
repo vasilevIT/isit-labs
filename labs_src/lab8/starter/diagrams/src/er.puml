@@ -1,0 +1,55 @@
+@startuml er
+' ER-диаграмма базы данных (PlantUML)
+' Как открыть: расширение «PlantUML» для VS Code (Alt+D — предпросмотр)
+'              или сайт https://www.plantuml.com/plantuml (вставить текст файла).
+' PK — первичный ключ, FK — внешний ключ, * — обязательное поле (NOT NULL)
+'
+' Обозначения связей (стороны читаются «от таблицы к таблице»):
+'   ||--o{   один ко многим   (у одной строки слева много строк справа; справа может не быть ни одной)
+'   ||--o|   один к одному    (справа не больше одной строки)
+'   |o--o{   один ко многим, где ссылка необязательна (внешний ключ может быть NULL)
+
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    ArrowColor #555555
+    HeaderBackgroundColor #E8F0FE
+}
+
+' ---------- ГОТОВО (образец) ----------
+entity "users\nучастники" as users {
+    * id : SERIAL <<PK>>
+    --
+    * name : VARCHAR(100)
+    * email : VARCHAR(255) <<UNIQUE>>
+    * role : VARCHAR(20) <<CHECK>>
+    * created_at : TIMESTAMP
+}
+
+entity "projects\nпроекты" as projects {
+    * id : SERIAL <<PK>>
+    --
+    * title : VARCHAR(150) <<UNIQUE>>
+    description : TEXT
+    * owner_id : INTEGER <<FK>>
+    * created_at : TIMESTAMP
+}
+
+users ||--o{ projects : "1 : N\nруководитель"
+
+' ---------- TODO ----------
+' Добавьте по образцу сущности user_profiles, tasks, comments, tags, task_tags
+' (поля — как в sql/01_schema.sql) и связи между ними:
+'   users    ||--o| user_profiles   1 : 1
+'   projects ||--o{ tasks           1 : N
+'   users    |o--o{ tasks           1 : N, исполнитель необязателен
+'   tasks    ||--o{ comments        1 : N
+'   users    ||--o{ comments        1 : N
+'   tasks    ||--o{ task_tags       N : M (через связующую таблицу)
+'   tags     ||--o{ task_tags       N : M
+' Затем перенесите диаграмму на свою предметную область.
+@enduml
