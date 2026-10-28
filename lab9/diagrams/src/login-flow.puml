@@ -1,0 +1,46 @@
+@startuml login-flow
+' Вход по токену и защищённый запрос (лабораторная работа №9)
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+    ArrowColor #555555
+    LifeLineBorderColor #999999
+    ParticipantBorderColor #333333
+    ParticipantBackgroundColor #E8F0FE
+    GroupBorderColor #FF5C33
+}
+skinparam NoteBackgroundColor #FFF1EC
+skinparam NoteBorderColor #FF5C33
+
+participant "Браузер\n(клиент: app.js, api.js)" as B
+participant "Сервер PHP\n(public/index.php)" as S
+participant "AuthController" as A
+database "storage/\nusers.json, tokens.json" as F
+
+== Вход ==
+B -> S : POST /api/auth/login\n{"email": "...", "password": "..."}
+S -> A : login()
+A -> F : найти участника по email
+A -> A : password_verify(пароль, password_hash)
+A -> F : сохранить хеш токена и срок действия
+A --> B : 200 {"token": "...", "user": {...}}
+note right of B : токен и участник\nсохраняются в localStorage
+
+== Любой следующий запрос ==
+B -> S : DELETE /api/tasks/5\nAuthorization: Bearer <токен>
+S -> S : охранник: токен есть в tokens.json\nи срок не вышел?
+alt токена нет, он неверный или просрочен
+    S --> B : 401 Требуется авторизация
+    note right of B : handleUnauthorized():\nэкран входа, «Сессия истекла»
+else токен действует, но роль не manager
+    S --> B : 403 Недостаточно прав
+else токен действует, роль подходит
+    S --> B : 204 (задача удалена)
+end
+
+== Выход ==
+B -> S : POST /api/auth/logout\nAuthorization: Bearer <токен>
+S -> F : удалить хеш токена
+S --> B : 204
+@enduml
