@@ -1,0 +1,28 @@
+# PostgreSQL 16 и Redis 7 для лабораторной работы №12
+# Запуск:           docker compose up -d
+# Консоль psql:     docker compose exec db psql -U postgres -d taskapp
+# Консоль Redis:    docker compose exec redis redis-cli
+# Если порт 5432 или 6379 занят (например, у вас уже установлен Redis или работает база из лабораторной работы №9),
+# запустите на других портах:  DB_PORT=5433 REDIS_PORT=6380 docker compose up -d
+# и передайте те же порты приложению и воркеру:  DB_PORT=5433 REDIS_PORT=6380 php -S localhost:8000 -t public
+#                                               DB_PORT=5433 REDIS_PORT=6380 php bin/worker.php
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: taskapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./sql:/sql
+      - pgdata12:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+volumes:
+  pgdata12:

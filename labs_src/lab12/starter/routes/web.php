@@ -1,0 +1,54 @@
+<?php
+// routes/web.php — таблица маршрутов: «какой адрес — какой контроллер и метод».
+// Переменная $router создаётся в public/index.php. Все маршруты готовы.
+
+use App\Controllers\Api\AuthController;
+use App\Controllers\Api\DebugController;
+use App\Controllers\Api\EventApiController;
+use App\Controllers\Api\NotificationApiController;
+use App\Controllers\Api\ProjectApiController;
+use App\Controllers\Api\ReportApiController;
+use App\Controllers\Api\TaskApiController;
+use App\Controllers\Api\UserApiController;
+use App\Controllers\HomeController;
+
+$router->get('/', [HomeController::class, 'index']);       // главная отправляет в клиентское приложение /client/
+
+// ---------- Вход и выход ----------
+$router->post('/api/auth/login', [AuthController::class, 'login']);     // единственный адрес API без входа
+$router->get('/api/auth/me', [AuthController::class, 'me']);
+$router->post('/api/auth/logout', [AuthController::class, 'logout']);
+
+// ---------- REST API ----------
+$router->get('/api/tasks', [TaskApiController::class, 'index']);
+$router->post('/api/tasks', [TaskApiController::class, 'store']);
+$router->get('/api/tasks/{id}', [TaskApiController::class, 'show']);
+$router->put('/api/tasks/{id}', [TaskApiController::class, 'update']);
+$router->patch('/api/tasks/{id}', [TaskApiController::class, 'update']);
+$router->delete('/api/tasks/{id}', [TaskApiController::class, 'destroy']);
+
+$router->get('/api/projects', [ProjectApiController::class, 'index']);
+$router->post('/api/projects', [ProjectApiController::class, 'store']);
+$router->get('/api/projects/{id}', [ProjectApiController::class, 'show']);
+$router->put('/api/projects/{id}', [ProjectApiController::class, 'update']);
+$router->patch('/api/projects/{id}', [ProjectApiController::class, 'update']);
+$router->delete('/api/projects/{id}', [ProjectApiController::class, 'destroy']);
+$router->get('/api/projects/{id}/tasks', [ProjectApiController::class, 'tasks']);
+
+$router->get('/api/reports/summary', [ReportApiController::class, 'summary']);          // этот маршрут должен стоять выше /api/reports/{id}
+$router->post('/api/reports', [ReportApiController::class, 'create']);                  // заказать отчёт (строится в фоне, ответ 202)
+$router->get('/api/reports/{id}', [ReportApiController::class, 'show']);                // состояние заявки на отчёт
+$router->get('/api/reports/{id}/download', [ReportApiController::class, 'download']);   // скачать готовый файл
+
+$router->get('/api/notifications', [NotificationApiController::class, 'index']);        // уведомления вошедшего участника
+
+$router->get('/api/users', [UserApiController::class, 'index']);
+$router->post('/api/users', [UserApiController::class, 'store']);
+$router->get('/api/users/{id}', [UserApiController::class, 'show']);
+$router->put('/api/users/{id}', [UserApiController::class, 'update']);
+$router->patch('/api/users/{id}', [UserApiController::class, 'update']);
+$router->delete('/api/users/{id}', [UserApiController::class, 'destroy']);
+
+// ---------- Журнал событий (лабораторная работа №12) ----------
+$router->get('/api/events', [EventApiController::class, 'index']);              // просмотр журнала (только руководитель)
+$router->get('/api/debug/error', [DebugController::class, 'error']);            // учебная ошибка для проверки журнала (только при debug)
