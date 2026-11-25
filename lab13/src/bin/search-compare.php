@@ -1,0 +1,91 @@
+<?php
+// bin/search-compare.php — сравнение двух способов поиска: PostgreSQL (ILIKE по названию) и OpenSearch.
+// Запуск:
+//     php bin/search-compare.php               # по 20 запросов на сценарий
+//     php bin/search-compare.php --n=50
+// Для сравнения скорости загрузите много задач: php bin/load-searchdata.php 100000, затем php bin/reindex.php
+// На маленькой базе (7 задач) сравнивайте качество: что находит и что пропускает каждый способ.
+// Для каждого сценария печатается: сколько задач нашёл каждый способ и сколько миллисекунд занял запрос (медиана по n запросам).
+// Поиск в PostgreSQL здесь — тот же запасной поиск, что в приложении (ILIKE по названию, TaskRepository::list).
+
+declare(strict_types=1);
+
+define('BASE_PATH', dirname(__DIR__));
+define('APP_PATH', BASE_PATH . '/app');
+require APP_PATH . '/autoload.php';
+require APP_PATH . '/helpers.php';
+
+use App\Core\Search;
+use App\Models\TaskRepository;
+
+$options = getopt('', ['n::']);
+$n = max(3, (int) ($options['n'] ?? 20));
+
+// Сценарии: запрос и пояснение «что проверяем» (названия и описания рассчитаны на тестовые данные из sql/seed.sql)
+$scenarios = [
+    ['форма',             'словоформа: в базе слово «форму»'],
+    ['форсма',            'опечатка в слове «форма»'],
+    ['авторизации экран', 'нужные слова, но в другом порядке'],
+    ['портал',            'слово есть только в названии проекта'],
+    ['почту',             'слово есть только в описании задачи'],
+    ['уведомление',       'слово в другой форме: в базе «уведомления»'],
+    ['отдела кадров',     'слова подряд, как в названии (ILIKE справится)'],
+];
+
+// Сценарии для большой базы (php bin/load-searchdata.php): названия там собираются из слов «отчёт», «договор», «квартальный»... (ГОТОВО)
+// Если задач больше 10 000, скрипт использует их, иначе — сценарии выше.
+$bigScenarios = [
+    ['отчёт',                         'частое слово в названии (примерно в каждой двадцатой задаче)'],
+    ['квартальный отчёт',             'два слова: ILIKE находит их только подряд, OpenSearch — любое из слов'],
+    ['квартальные отчёты',            'те же слова в другой форме (ILIKE не найдёт ничего)'],
+    ['срочный договор для партнёров', 'длинная фраза из названия'],
+    ['заказчика',                     'слово только из описания'],
+    ['Альфа',                        'слово только из названия проекта'],
+];
+
+if (!Search::ping()) {
+    echo "OpenSearch не отвечает. Проверьте: php bin/search-check.php\n";
+    exit(1);
+}
+$total = (int) App\Core\Database::connection()->query('SELECT COUNT(*) FROM tasks')->fetchColumn();
+if ($total >= 10000) {
+    $scenarios = $bigScenarios;
+}
+echo "Задач в базе: $total. Запросов на сценарий: $n.\n";
+if ($total < 10000) {
+    echo "(Задач мало: время почти одинаково, смотрите на то, ЧТО находит каждый способ. Для сравнения скорости: php bin/load-searchdata.php 100000 и php bin/reindex.php)\n";
+}
+echo "\n| Запрос | Что проверяем | PostgreSQL: найдено | PostgreSQL, мс (медиана) | OpenSearch: найдено | OpenSearch, мс (медиана) | Лучший результат OpenSearch |\n";
+echo "|--------|---------------|--------------------:|---------------:|--------------------:|---------------:|-----------------------------|\n";
+
+// Медиана: «типичное» время. Одно случайно медленное выполнение (занят компьютер) не портит картину, как портит среднее.
+$median = function (array $values): float {
+    sort($values);
+    $middle = intdiv(count($values), 2);
+    return count($values) % 2 ? $values[$middle] : ($values[$middle - 1] + $values[$middle]) / 2;
+};
+
+$tasks = new TaskRepository();
+foreach ($scenarios as [$q, $what]) {
+    try {
+        $tasks->list('', null, $q, '', 10, 0);                   // прогрев: первый запрос всегда медленнее
+        Search::search($q);
+
+        $timesPg = $timesOs = [];
+        for ($i = 0; $i < $n; $i++) {
+            $t = hrtime(true);
+            $pg = $tasks->list('', null, $q, '', 10, 0);
+            $timesPg[] = (hrtime(true) - $t) / 1e6;
+
+            $t = hrtime(true);
+            $os = Search::search($q);                            // время считаем вместе с передачей данных по сети, как увидит приложение
+            $timesOs[] = (hrtime(true) - $t) / 1e6;
+        }
+    } catch (Throwable $e) {
+        printf("| %s | %s | — | — | — | — | ошибка: %s |\n", $q, $what, $e->getMessage());
+        continue;
+    }
+    $best = $os['results'][0]['title'] ?? '—';
+    printf("| %s | %s | %d | %.1f | %d | %.1f | %s |\n", $q, $what, $pg['total'], $median($timesPg), $os['total'], $median($timesOs),
+        mb_strlen($best) > 45 ? mb_substr($best, 0, 42) . '...' : $best);
+}

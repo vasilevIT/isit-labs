@@ -1,0 +1,49 @@
+# PostgreSQL 16, Redis 7 и OpenSearch 2 для лабораторной работы №13
+# Запуск:           docker compose up -d
+# Консоль psql:     docker compose exec db psql -U postgres -d taskapp
+# Консоль Redis:    docker compose exec redis redis-cli
+# Проверка поиска:  curl http://localhost:9200    (OpenSearch стартует 20–60 секунд; нужно примерно 1,5 ГБ свободной памяти для Docker)
+# Если порт 5432, 6379 или 9200 занят (например, у вас уже установлен Redis или работает база из лабораторной работы №9),
+# запустите на других портах:  DB_PORT=5433 REDIS_PORT=6380 OPENSEARCH_PORT=9201 docker compose up -d
+# и передайте те же порты приложению и воркеру:  DB_PORT=5433 REDIS_PORT=6380 OPENSEARCH_PORT=9201 php -S localhost:8000 -t public
+#                                               DB_PORT=5433 REDIS_PORT=6380 OPENSEARCH_PORT=9201 php bin/worker.php
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: taskapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./sql:/sql
+      - pgdata13:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  # Поисковый сервер. Один узел, без защиты (только для учёбы!), память ограничена 512 МБ, чтобы он помещался в Docker.
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true        # без логина и HTTPS: в рабочей системе так делать нельзя
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - bootstrap.memory_lock=false
+      - OPENSEARCH_JAVA_OPTS=${OPENSEARCH_JAVA_OPTS:--Xms512m -Xmx512m}     # память для OpenSearch; если Docker не хватает памяти (контейнер завершился с кодом 137), уменьшите: -Xms256m -Xmx256m
+      - DISABLE_PERFORMANCE_ANALYZER_AGENT_CLI=true                          # отключаем служебный агент мониторинга: он ест память и нам не нужен
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "${OPENSEARCH_PORT:-9200}:9200"
+    volumes:
+      - osdata13:/usr/share/opensearch/data
+
+volumes:
+  pgdata13:
+  osdata13:
